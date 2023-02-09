@@ -19,12 +19,12 @@ res = 0
 def BFS(): #벽 3개를 만들면 이제 실행하는거야
     global res
     dq = deque()
-    temp = copy.deepcopy(g)
+    temp = copy.deepcopy(g) #그래프를 옮긴다.
 
     for i in range(n):
         for j in range(m):
             if g[i][j] == 2: #바이러스
-                dq.append((i,j))
+                dq.append((i,j))   #미리 닮아둬야지 ! 먼저 있는 것들부터 퍼져야함.
     
     while dq:
         x,y = dq.popleft()
@@ -40,8 +40,10 @@ def BFS(): #벽 3개를 만들면 이제 실행하는거야
     
     #전부 다 돌면서 바이러스 퍼트렸따면 이제 안전지대 개수
     cnt = 0
-    for i in range(n):  
-        cnt += temp[i].count(0) # 안전지대 계산
+    for i in range(n):
+        for j in range(m):
+            if temp[i][j] == 0:
+                cnt += 1
     res = max(res,cnt)
 
 
