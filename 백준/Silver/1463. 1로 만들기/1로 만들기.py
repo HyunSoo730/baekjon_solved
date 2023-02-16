@@ -1,18 +1,21 @@
 import sys
 
-N = int(input())
-dp = [0] * (N+1)
+# input = sys.stdin.readline
 
-#방법이 3가지이기 때문에 그리디로 풀 수 없음 dp로 해야함
-#1번 인덱스부터 사용.
-# 3가지 방법 모두 구해보고 최솟값 채택.
-for i in range(2,N+1):
-    dp[i] = dp[i-1] + 1 #1을 뺴는 경우
-    
-    if i % 3 == 0:
-        dp[i] = min(dp[i], dp[i//3] + 1)   #1을 뺴는 것과 3으로 나누는 것중에 최솟값 채택
-    
+#현재 선택한 방법이 다음번에 영향을 끼치네. 그리디가 아닌 dp로
+#n이 1이되는데 걸리는 최소 횟수..
+n = int(input())
+INF = 24242424
+dp = [INF] * (n+1)
+dp[1] = 0 #자명한건 미리 초기화.
+
+#자명한건 미리 초기화
+
+for i in range(2, n+1):
+    dp[i] = dp[i-1] + 1 #1을 빼는 것을 확정적으로 하고 
     if i % 2 == 0:
-        dp[i] = min(dp[i], dp[i//2] + 1)
+        dp[i] = min(dp[i//2] + 1, dp[i])
+    if i%3==0:
+        dp[i] = min(dp[i//3] + 1, dp[i])
 
-print(dp[N])
+print(dp[n])
