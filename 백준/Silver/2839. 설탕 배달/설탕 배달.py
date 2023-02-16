@@ -1,17 +1,19 @@
+import sys
 
-N = int(input())
+# input = sys.stdin.readline
 
-res = 0
-
-while N > 0:
-    if N % 5 == 0:
-        res += N // 5
+n = int(input())
+#3,5 두개 있음
+cnt = 0
+while n > 0:
+    if n % 5 == 0:
+        cnt += n // 5
+        n = n%5
         break
-    N -= 3
-    res += 1
-
-if N < 0:
-    print(-1)
+    else:
+        n -= 3 
+        cnt += 1
+if n == 0:
+    print(cnt)
 else:
-    print(res)
-
+    print(-1)
