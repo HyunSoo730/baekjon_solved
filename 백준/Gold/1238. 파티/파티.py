@@ -1,4 +1,6 @@
 import sys
+
+
 import heapq
 
 #최단거리. 그래프.
@@ -28,14 +30,16 @@ def dijkstra(start):
                 
     return distance
 
-res = 0
+res = [0] * (n+1)
 for i in range(1,n+1):
     if i != x:
-        toX = dijkstra(i)
-        fromX = dijkstra(x)
-        res = max(res, toX[x] + fromX[i])
+        toX = dijkstra(i)  #i에서 출발하는 모든정점까지의 최단거리를 저장하고
+        fromX = dijkstra(x)   #x에서 출발하는 모든 정점까지의 최단거리 저장하고
+        res[i] = toX[x] + fromX[i]
+    #왜 x-> x->x 를 포함하지 않아야 되는가? 단방향이라서 ?
 
-print(res)
+# x->x->x 이 경우가 정답보다 큰 경우가 있을 수도 있다?
+print(max(res))
     
     
     
