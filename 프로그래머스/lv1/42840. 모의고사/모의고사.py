@@ -1,33 +1,21 @@
 def solution(answers):
     
-    a = []
-    n = len(answers)
-    cnt = 1
-    for i in range(n):
-        a.append(cnt)
-        cnt += 1
-        if cnt == 6:
-            cnt = 1  
-    #1번 학생 답안지 완성
+    a = [1,2,3,4,5]
     b = [2,1,2,3,2,4,2,5]
-    while len(b) < n:
-        b = b * 2
-    b = b[:n]   
-    #2번 학생 답안지 완성
     c = [3,3,1,1,2,2,4,4,5,5]
-    while len(c) < n:
-        c = c * 2
-    c = c[:n]
-    #3번 학생 답안지 완성
-    
+    n = len(answers)
     cnt = [0] * 3
+    
     for i in range(n):
-        if a[i] == answers[i]:
+        ans = answers[i]
+        if a[i%len(a)] == ans:
             cnt[0] += 1
-        if b[i] == answers[i]:
+        if b[i%len(b)] == ans:
             cnt[1] += 1
-        if c[i] == answers[i]:
+        if c[i%len(c)] == ans:
             cnt[2] += 1
+        
+        
     
     max_cnt = max(cnt)
     res = []
