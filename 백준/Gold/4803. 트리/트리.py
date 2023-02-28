@@ -1,5 +1,6 @@
 import sys
 
+
 def find_parent(x): #x노드의 부모(속하는 집합) 찾기
     if parent[x] != x:
         parent[x] = find_parent(parent[x])
@@ -51,7 +52,6 @@ while True:
     check = set(temp)   #만약 사이클이 있다면 추가해야지.
     for i in range(1,n+1):
         find_parent(i) #부모 갱신 굳이 안해줘도 ?
-    # print(parent)
     
     # print(check)
     cnt = 0
