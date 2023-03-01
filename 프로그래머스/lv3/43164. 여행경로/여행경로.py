@@ -11,14 +11,14 @@ def solution(tickets):
         #방향성 존재
         
     for x in g.values():
-        x.sort()
+        x.sort()#미리 정렬
     
     res = ["ICN"]
     result = []
+    
     def DFS(L, now):
         if L == n + 1: #경로 모두 탐색. 종료조건
             result.append(res[:])
-            return 
         else:
             for i in range(len(g[now])): #경로 여러개일 수도 있으니
                 if ch[now][i] == 0:
@@ -26,13 +26,10 @@ def solution(tickets):
                     res.append(g[now][i])
                     DFS(L+1, g[now][i])
                     ch[now][i] = 0
-                    res.pop()  #이 문제는 딱 하나의 경로만을 찾으면 되므로 백트랙킹 시 원상복구 안시켜야 더 빨라.
-                    #왜냐하면 위에서 이미 오름차순으로 정렬을 해준 상태에서 DFS를 시작하기 떄문.
+                    res.pop()   #
                 
     DFS(1, "ICN")
-    print(result[0])
     return result[0] #한개가 저장되지만 첫번째꺼 리턴해줘야 함.
-                
                 
                 
                 
