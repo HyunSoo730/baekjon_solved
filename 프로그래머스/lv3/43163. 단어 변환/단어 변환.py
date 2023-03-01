@@ -1,33 +1,31 @@
-from collections import deque
+from collections import defaultdict, deque
 def solution(begin, target, words):
     if target not in words:
-        return 0 #바로 끝내기
+        return 0
     
+    ch = defaultdict(int)
+    for word in words:
+        ch[word] = 0
     n = len(words)
-    ch = [0] * n
-    res = 0
-    def BFS():
-        dq = deque()#해당 단어를 만드는데 몇번 걸렸는지를 확인하는 카운트도 함께.
-        dq.append((begin, 0))
-        
+    def BFS(a,b):
+        dq = deque()
+        dq.append((a, b)) #해당 word까지 오는데 걸린 횟수 cnt
+        ch[a] = 1 #시작 지점 방문        
         while dq:
             word, cnt = dq.popleft()
             if word == target:
                 return cnt
-            #그게 아니라면 계속 찾아나가야함(상태트리)
-            for i in range(n): #단어 개수만큼
-                if ch[i] == 0: #아직 확인 안한 단어
-                    temp = words[i]
-                    m = len(temp)
-                    count = 0
-                    for j in range(m):
-                        if word[j] != temp[j]:
-                            count += 1
-                    if count == 1: #한글자만 다른 경우 뻗어나갈 수 있음
-                        dq.append((temp, cnt + 1))
-                        ch[i] = 1 #넣을꺼니까 갱신
-        return 0
-    res = BFS()
+            for w in words:
+                if ch[w] == 0: #방문 전
+                    check = 0
+                    for i in range(len(word)):
+                        if word[i] != w[i]:
+                            check += 1
+                    if check == 1: #같지 않은게 딱 한개라면
+                        #방문 가능
+                        ch[w] = 1
+                        dq.append((w,cnt+1))
+    res = BFS(begin,0)
+    print(res)
     return res
-                        
-            
+        
