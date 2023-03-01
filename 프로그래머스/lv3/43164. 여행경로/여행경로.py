@@ -1,40 +1,43 @@
 from collections import defaultdict
 def solution(tickets):
     n = len(tickets)
-    data =tickets
-    
-    g = defaultdict(list)
-    ch = defaultdict(list) #중복 체크도 딕셔너리로
-    
+    data = tickets
+    g = defaultdict(list) #노드값이 문자열일 경우 defaultdict 사용하자
+    ch = defaultdict(list)
     for i in range(n):
-        k, v = data[i][0], data[i][1]
-        g[k].append(v) #해당 딕셔너리에 k값에 대응하는 value가 비어있으면 빈 리스트 만들고 v추가.
-        ch[k].append(0)
-    #알파벳 순이니까 value를 기준으로 오름차순
-    for k,v in g.items():
-        v.sort()
+        a,b = data[i][0], data[i][1]
+        g[a].append(b)
+        ch[a].append(0)
+        #방향성 존재
+        
+    for x in g.values():
+        x.sort()
     
     res = ["ICN"]
-    def DFS(L, now):
-        if L == n+1: #전부 다 확인. 종료조건
-            tmp = []
-            for x in res:
-                tmp.append(x)
-            result.append(tmp)
-        else: #계속 가야함
-            for i in range(len(g[now])):
-                if ch[now][i] == 0: #아직 해당 문자열 노드를 아직 방문하지 않았다면
-                    ch[now][i] = 1
-                    node = g[now][i] #인접노드
-                    res.append(node)
-                    DFS(L+1, node)
-                    res.pop()
-                    ch[now][i] = 0
-        
     result = []
-    DFS(1,"ICN") 
-    return result[0]
-    
+    def DFS(L, now):
+        if L == n + 1: #경로 모두 탐색. 종료조건
+            result.append(res[:])
+            return 
+        else:
+            for i in range(len(g[now])): #경로 여러개일 수도 있으니
+                if ch[now][i] == 0:
+                    ch[now][i] = 1 #방문 처리
+                    res.append(g[now][i])
+                    DFS(L+1, g[now][i])
+                    ch[now][i] = 0
+                    res.pop()  #이 문제는 딱 하나의 경로만을 찾으면 되므로 백트랙킹 시 원상복구 안시켜야 더 빨라.
+                    #왜냐하면 위에서 이미 오름차순으로 정렬을 해준 상태에서 DFS를 시작하기 떄문.
+                
+    DFS(1, "ICN")
+    print(result[0])
+    return result[0] #한개가 저장되지만 첫번째꺼 리턴해줘야 함.
+                
+                
+                
+                
+                
+                
+                
+                
         
-    
-            
