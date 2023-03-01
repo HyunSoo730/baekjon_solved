@@ -22,7 +22,7 @@ def solution(word):
                     j += 1
                     n -= 1
                 print("temp", temp)
-            cnt += (i) * temp
+            cnt += (i) * temp #앞자리가 무엇인지 파악해야 하므로.
         print("cnt", cnt)
     return cnt
                 
