@@ -1,14 +1,17 @@
 cnt = 0
-def DFS(L, sum, data, target):
-    global cnt
-    if L == len(data): #모두 확인. 종료조건
-        if sum == target:
-            cnt += 1
-    else: #더하거나 빼거나
-        DFS(L+1, sum + data[L], data,target) #더하기
-        DFS(L+1, sum - data[L], data,target) #빼기
-        
-
 def solution(numbers, target):
-    DFS(0,0,numbers,target)
+    n = len(numbers)
+    print(n,numbers,target)
+    data = numbers
+    def DFS(L, sum):
+        global cnt
+        if L == n: #모든 인덱스 확인, 종료조건
+            if sum == target:
+                cnt += 1
+        else:
+            DFS(L+1, sum + data[L]) #해당 인덱스 더함
+            DFS(L+1, sum - data[L])
+    
+    DFS(0,0)
+    print(cnt)
     return cnt
