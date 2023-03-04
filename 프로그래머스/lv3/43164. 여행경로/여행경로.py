@@ -1,40 +1,32 @@
 from collections import defaultdict
 def solution(tickets):
-    n = len(tickets)
     data = tickets
-    g = defaultdict(list) #노드값이 문자열일 경우 defaultdict 사용하자
+    n = len(tickets)
+    g = defaultdict(list)
     ch = defaultdict(list)
-    for i in range(n):
-        a,b = data[i][0], data[i][1]
-        g[a].append(b)
-        ch[a].append(0)
-        #방향성 존재
-        
+    for x,y in data:
+        #x->y 인접 리스트 형식으로
+        g[x].append(y)
+        ch[x].append(0)
+    #인접 리스트 완성
+    #경로 알파벳 순
     for x in g.values():
-        x.sort()#미리 정렬
+        x.sort() #경로들 모두 정렬
     
     res = ["ICN"]
     result = []
-    
     def DFS(L, now):
-        if L == n + 1: #경로 모두 탐색. 종료조건
+        if L == n+1: #종료조건
             result.append(res[:])
-        else:
-            for i in range(len(g[now])): #경로 여러개일 수도 있으니
-                if ch[now][i] == 0:
-                    ch[now][i] = 1 #방문 처리
+        else: #계속 돌아다녀야지
+            for i in range(len(g[now])): #현재 노드의 인접 노드들의 개수만큼 확인
+                if ch[now][i] == 0: #아직 방문 전
+                    ch[now][i] = 1
                     res.append(g[now][i])
-                    DFS(L+1, g[now][i])
+                    DFS(L+1, g[now][i]) #백트랙킹 시 원상복구
                     ch[now][i] = 0
-                    res.pop()   #
-                
-    DFS(1, "ICN")
-    return result[0] #한개가 저장되지만 첫번째꺼 리턴해줘야 함.
-                
-                
-                
-                
-                
-                
-                
-        
+                    res.pop()
+    DFS(1, "ICN") 
+    print(result[0])
+    return result[0]
+    
