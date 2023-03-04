@@ -10,7 +10,6 @@ def solution(begin, target, words):
     def BFS(a,b):
         dq = deque()
         dq.append((a, b)) #해당 word까지 오는데 걸린 횟수 cnt
-        ch[a] = 1 #시작 지점 방문        
         while dq:
             word, cnt = dq.popleft()
             if word == target:
