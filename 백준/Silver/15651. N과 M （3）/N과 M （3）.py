@@ -1,19 +1,18 @@
 import sys
 
-
 n,m = map(int, input().split())
-#n개 중 m개 중복 순열
+#중복 가능.
+#중복 순열
 
-res = [0] * m #결과를 저장할 리스트
-
+res = []
 def DFS(L):
-    if L == m: #종료 조건, m개 선택
+    if L == m: #모두 선택. 종료조건
         for x in res:
             print(x, end = " ")
         print()
-    else: #계속 선택
+    else:
         for i in range(1,n+1):
-            res[L] = i
+            res.append(i)
             DFS(L+1)
-
+            res.pop()
 DFS(0)
