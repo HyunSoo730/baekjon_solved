@@ -1,11 +1,16 @@
+import sys
 from collections import deque
-n, k = map(int, input().split())
-queue = deque(range(1, n + 1))
-answer = []
- 
-while queue:
+
+
+# n , k
+n,k = map(int, input().split())
+
+dq = deque(range(1,n+1))
+
+res = []
+while dq:
     for _ in range(k-1):
-        queue.append(queue.popleft())
-    answer.append(queue.popleft())
- 
-print(str(answer).replace('[', '<').replace(']', '>'))
+        dq.append(dq.popleft())
+    res.append(dq.popleft())
+
+print(str(res).replace('[', '<').replace(']', '>'))
