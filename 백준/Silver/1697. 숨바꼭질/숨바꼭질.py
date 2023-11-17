@@ -1,19 +1,25 @@
 import sys
 from collections import deque
 
+
+n,k = map(int, input().split())
+
+dis = [0] * 100001
+ch = [0] * 100001
 def bfs(v):
-    q = deque([v])
-    while q:
-        v = q.popleft()
-        if v == k:
-            return array[v]
-        for next_v in (v-1, v+1, 2*v):
-            if 0 <= next_v < MAX and not array[next_v]:
-                array[next_v] = array[v] + 1
-                q.append(next_v)
+    ch[v] = 1 # 방문처리
+    dq = deque()
+    dq.append(v)
 
+    while dq:
+        now = dq.popleft()
+        if now == k:
+            break
+        for nv in (now-1, now+1, now*2):
+            if 0<=nv<100001 and ch[nv] == 0:
+                ch[nv] = 1
+                dq.append(nv)
+                dis[nv] = dis[now] + 1
 
-MAX = 100001
-n, k = map(int, sys.stdin.readline().split())
-array = [0] * MAX
-print(bfs(n))
+bfs(n)
+print(dis[k])
