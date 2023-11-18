@@ -1,24 +1,19 @@
 import sys
 from collections import deque
 
-
 n,m = map(int, input().split())
-#중복없이 m개 선택 : 순열
+visited = [0] * (n+1)
 res = []
-ch = [0] * (n+1)
-def DFS(L):
-    if L == m: #모두 선택. 종료조건
-        for x in res:
-            print(x, end = " ")
-        print()
+def dfs(L):
+    if L == m: # m개 뽑음. 종료조건
+        print(*res)
     else:
         for i in range(1,n+1):
-            if ch[i] == 0:
-                ch[i] = 1
+            if visited[i] == 0:
+                visited[i] = 1 # 방문처리 후
                 res.append(i)
-                DFS(L + 1)
-                ch[i] = 0
-                res.pop()  # 백트랙킹 시 원상복구
+                dfs(L+1)
+                res.pop()
+                visited[i] = 0 # 백트랙킹 시 원상복구
 
-
-DFS(0)
+dfs(0)
