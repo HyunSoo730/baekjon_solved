@@ -1,29 +1,32 @@
-import sys
 
-from collections import deque
+N = int(input())
+A, B = map(int, input().split())
+M = int(input())
+graph = [[] for _ in range(N+1)]
+visited = [False] * (N+1)
+result = []
+####
 
-n = int(input())
-v,w = map(int, input().split())
-m = int(input())
-g = [[] for _ in range(n+1)]
-for _ in range(m):
-    a,b = map(int, input().split())
-    g[a].append(b)
-    g[b].append(a)
+# 어떤 노드들이 연결되어 있는지 graph라는 2차원 배열에 저장
+for _ in range(M):
+  x, y = map(int, input().split())  
+  graph[x].append(y)
+  graph[y].append(x)
 
-ch = [0] * (n+1)
-res = -1
-def DFS(v, cnt):
-    global res
-    if v == w:
-        res = cnt
-    ch[v] = 1
-    for node in g[v]:
-        if ch[node] == 0:
-            DFS(node, cnt + 1)
+# dfs
+def dfs(v, num):
+  num += 1
+  visited[v] = True
 
-DFS(v,0)
-if res == -1:
-    print(-1)
+  if v == B:
+    result.append(num)
+
+  for i in graph[v]:
+    if not visited[i]:
+      dfs(i, num)
+
+dfs(A, 0)
+if len(result) == 0:
+  print(-1)
 else:
-    print(res)
+  print(result[0]-1)
