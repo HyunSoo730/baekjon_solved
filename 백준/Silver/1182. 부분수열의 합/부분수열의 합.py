@@ -1,20 +1,17 @@
 import sys
-
-input = sys.stdin.readline
 from collections import deque
 
-n, s = map(int, input().split())
+n,s = map(int, input().split())
 data = list(map(int, input().split()))
 cnt = 0
-def DFS(L,sum, check):
+res = []
+def dfs(L, res):
     global cnt
-    if L == n:
-        if sum == s:
-            if check != 0:
-                cnt += 1
+    if L == n: # 모두 확인. 종료조건
+        if sum(res) == s and len(res) != 0:
+            cnt += 1
     else:
-        DFS(L+1, sum + data[L], check + 1)
-        DFS(L+1, sum, check)
-
-DFS(0,0,0)
+        dfs(L+1, res + [data[L]])
+        dfs(L+1, res)
+dfs(0,res)
 print(cnt)
