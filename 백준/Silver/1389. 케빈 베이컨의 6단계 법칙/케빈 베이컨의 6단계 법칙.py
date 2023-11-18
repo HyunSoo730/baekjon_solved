@@ -1,46 +1,34 @@
 import sys
-
-input = sys.stdin.readline
 from collections import deque
 
-#몇단계만에 만날지 계산
-#최단거리
-#최단거리를 가지는 사람 구하기
-
-n,m = map(int ,input().split()) #노드, 간선
+n,m = map(int, input().split())
 g = [[] for _ in range(n+1)]
 for _ in range(m):
     a,b = map(int, input().split())
     g[a].append(b)
     g[b].append(a)
 
-def BFS(v):
+res = int(1e9) # 최소 비용
+def bfs(v): # 현재 노드와 현재 레벨
+    res = 0 # 최종 케빈 베이컨의 수 저장을 위한 변수
+    visited[v] = 1 # 현재 노드 방문 처리
     dq = deque()
-    ch[v] = 1 #방문 처리
-    dq.append(v) #노드, 거리
+    dq.append((v,0)) # (현재노드, 레벨) 이렇게 넣어줄꺼야.
+
     while dq:
-        now = dq.popleft() #현재 노드
-        for x in g[now]: #현재 노드의 인접 노드
-            if ch[x] == 0: #아직 방문 전
-                ch[x] = 1 #
-                dis[x] = dis[now] + 1 #x까지 가는 최단거리는 now까지의 거리 + 1
-                dq.append(x)
-                # print("length : " , length)
-        # print(dis)
-res = []
+        now, level = dq.popleft()
+        for node in g[now]: # 현재 노드의 인접노드들 확인
+            if visited[node] == 0:# 아직 방문 전이라면
+                visited[node] = 1 # 방문처리 후
+                res += level
+                dq.append((node, level+1)) # 레벨 차수 증가시키고 삽입 진행
+    return res
+max_res = int(1e9)
+idx = -1
 for i in range(1,n+1):
-    ch = [0] * (n+1)
-    dis = [0] * (n+1)   #체크 변수와 dis 최단거리 리스트를 따로 만들어도 될까..? 하나로 통합해서 사용하는거 연습해야 할듯?
-    BFS(i)
-    res.append(sum(dis))
-
-r_idx = res.index(min(res))
-print(r_idx + 1)
-
-
-
-
-
-
-
-    
+    visited = [0] * (n+1)
+    r = bfs(i)
+    if r < max_res:
+        idx = i
+        max_res = r
+print(idx)
