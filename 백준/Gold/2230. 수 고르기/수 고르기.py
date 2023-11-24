@@ -1,27 +1,19 @@
 import sys
 
-N, M = map(int, input().split())
+n,m = map(int, input().split())
 data = []
-for i in range(N):
+for _ in range(n):
     data.append(int(input()))
+data.sort()
+res = int(2e9) # 차이가 m 이상이면서 가장 작은 경우를 기록하기 위해
 
-data.sort()   #이진 탐색이든 투 포인터 알고리즘이든 정렬될 상태에서 시작해야함 !!
-
-#투 포인터 알고리즘
-left = 0
-right = 1
-
-res = 2424242424
-while left < N and right < N:
-    temp = data[right] - data[left]
-
-    if temp == M: #특수한 경우. 이것보다 작아질 수 없으니 무조건 답
-        res = M
-        break       
-    elif temp > M: #답의 범위
-        res = min(res, temp)   #기존 최솟값과 비교해서 더 최솟값을 찾아야지.
-        left += 1
+e = 0
+for s in range(n):
+    # 차이가 m보다 작으면 끝점을 증가시켜서 차이를 키워
+    while e < n and data[e] - data[s] < m:
+        e += 1
+    if e < n and data[e] - data[s] >= m: # 반복문 탈출 시 끝점과 시작점 값 차이가 m 이상.
+        res = min(res, data[e] - data[s])
     else:
-        right += 1
-
+        break
 print(res)
