@@ -24,11 +24,6 @@ def dfs(L,start):
             res.append(i)
             dfs(L+1, i+1)
             res.pop()
-def cal(data):
-    sum_data = 0
-    for i in range(len(data)):
-        for j in range(len(data)):
-            sum_data += data[i][j]
-    return sum_data
+
 dfs(0,0)
 print(result)
