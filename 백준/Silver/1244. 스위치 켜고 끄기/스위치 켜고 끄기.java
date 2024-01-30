@@ -53,27 +53,26 @@ public class Main {
 
     public static void switchData(int gen, int num) {
         if (gen == 1) { // 남자인 경우
-            int i =1;
-            while (num * i <= n) {
-                if(data[num*i] == 0) data[num*i] = 1;
-                else if(data[num*i] == 1) data[num*i] = 0;
-                i += 1;
+            for (int i = 0; i <= n; i += num) {
+                if(num + i > n) break;
+                data[num + i] = data[num + i] == 0 ? 1 : 0;
             }
         }else{  // 여자
             // 현재 좌표 num 기준 양 사이드 확인 .
-            int i=1;
-            while (num - i >= 1 && num + i < n + 1) {
-                if (data[num - i] == data[num + i]) {
-                    if(data[num-i] == 0) data[num-i] = 1;
-                    else if(data[num-i] == 1) data[num-i] = 0;
-                    if(data[num+i] == 0) data[num+i] = 1;
-                    else if(data[num+i] == 1) data[num+i] = 0;
-                }else
+            for (int i = 1; i <= n; i++) {
+                if (num - i < 1 || num + i > n) {
                     break;
-                i+=1;
+                }
+//                System.out.println(data[num-i] == data[num+i]);
+//                System.out.println("num-i = " + (num - i) + " num+i = " + (num+i));
+                if (data[num - i] == data[num + i]) {
+                    data[num + i] = data[num + i] == 0 ? 1 : 0;
+                    data[num - i] = data[num - i] == 0 ? 1 : 0;
+                } else {
+                    break;
+                }
             }
-            if(data[num] == 0) data[num] = 1;
-            else if(data[num] == 1) data[num] = 0;
+            data[num] = data[num] == 0 ? 1 : 0;
         }
     }
 }
