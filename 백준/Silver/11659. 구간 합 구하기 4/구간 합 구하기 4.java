@@ -4,6 +4,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
+/**
+ * @author 조현수
+ * @date 24.1.31
+ * @link 백준_11659_구간 합 구하기4
+ * @keyword_solution 구간합, 한번에 배열에 저장하기
+ * @input 1차원 배열
+ * @output
+ * @time_complex O(N)
+ * @perf 메모리 ~, 소요시간 ~
+ */
 public class Main {
 
     static int n,m; // 수의 개수 n, 합을 구해야 하는 횟수 m
