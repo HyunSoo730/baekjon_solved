@@ -17,6 +17,7 @@ public class Solution {
         for (int t = 1; t <= 10; t++) {
             n = Integer.parseInt(br.readLine());
             String data = br.readLine();
+            stack = new Stack<>();
             if (checkBrackets(data)) {
                 System.out.println("#" + t + " " + 1);
             } else {
@@ -47,6 +48,9 @@ public class Solution {
                     return false;
                 }
             }
+        }
+        if (!stack.isEmpty()) {  // 위의 경우에서 닫힌 괄호일 때마다 전부 pop 했는데도 남아있다면 그건 열린괄호.  그렇기에 짝이 안 맞음
+            return false;
         }
         return true;
     }
