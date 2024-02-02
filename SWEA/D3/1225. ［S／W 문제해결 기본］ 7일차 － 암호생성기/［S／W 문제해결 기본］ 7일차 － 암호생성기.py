@@ -1,22 +1,52 @@
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.StringTokenizer;
 
-from collections import deque
+public class Solution {
 
-def cycle(dq):
-    while True:
-        for i in range(1,6):   # 사이클
-            now = dq.popleft()
-            if now - i <= 0:
-                dq.append(0)
-                return dq
-            dq.append(now - i)
+    /**
+     * ! 8자리 암호 생성 , 8개 숫자 입력 받음.
+     * * 덱을 이용해서 해결
+     */
 
+    static int t, T = 10;
+    static int[] data;
+    static Deque<Integer> dq;
+    static StringBuilder sb = new StringBuilder();
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st;
 
-T = 10
-for t in range(1,T+1):
-    test_case = int(input())
-    data = list(map(int, input().split()))
-    dq = deque(data)
-    res = cycle(dq)
-    print(f"#{t}", end = " ")
-    print(*res)
+        for (int tc = 1; tc <= T; tc++) {
+            t = Integer.parseInt(br.readLine());
+            st = new StringTokenizer(br.readLine());
+            dq = new ArrayDeque<>();
+            for (int i = 0; i < 8; i++) {
+                dq.offer(Integer.parseInt(st.nextToken()));
+            }
 
+            outer :
+            while (true) {
+                for (int i = 1; i <= 5; i++) {
+                    int num = dq.poll();
+                    if (num - i <= 0) {
+                        dq.offer(0);
+                        break outer;
+                    } else {
+                        dq.offer(num - i);
+                    }
+                }
+            }
+            sb.append("#").append(tc).append(" ");
+            for (int i = 0; i < 8; i++) {
+                sb.append(dq.poll()).append(" ");
+            }
+            sb.append("\n");
+        }
+        System.out.println(sb);
+    }
+}
