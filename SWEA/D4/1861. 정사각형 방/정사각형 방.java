@@ -7,13 +7,10 @@ import java.util.StringTokenizer;
 public class Solution {
 
     static int T, n;
-
     static int[][] g;
-    static int roomNum, max_cnt;
+    static int max_cnt, startRoom = Integer.MAX_VALUE;
     static int[] dx = {1, -1, 0, 0};
     static int[] dy = {0, 0, 1, -1};
-    static int cnt, resX, resY;
-    static boolean[][] visited;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st;
@@ -29,48 +26,29 @@ public class Solution {
                 }
             }
             // 로직
-            solve();
-            System.out.println("#" + t + " " + roomNum + " " + max_cnt);
-        }
-    }
-
-    public static void solve() {
-        int res = 0;
-        max_cnt = Integer.MIN_VALUE;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                visited = new boolean[n][n];
-                visited[i][j] = true; // 시작 좌표 방문처리 후 시작.
-                cnt = 0;
-                DFS(i,j, 1);
-                if(res < cnt){
-                    res = cnt;
-                    roomNum = g[i][j];
-                    max_cnt = cnt;
-                    resX = i;
-                    resY = j;
-                } else if (res == cnt && g[i][j] < g[resX][resY]) {
-                    roomNum = g[i][j];
-                    max_cnt = cnt;
-                    resX = i;
-                    resY = j;
+            max_cnt = Integer.MIN_VALUE;
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    DFS(i, j, 1, g[i][j]);
                 }
             }
+            System.out.println("#" + t + " " + startRoom + " " + max_cnt);
         }
-
     }
 
-    public static void DFS(int x, int y, int count) {
-        cnt = Math.max(cnt, count);
+    // 현재 룸 넘버로 같이 그냥 저장용으로 넣어줌
+    public static void DFS(int x, int y, int count, int roomNum) {
+        if (count > max_cnt) {
+            max_cnt = count;
+            startRoom = roomNum;
+        } else if (count == max_cnt) {
+            startRoom = Math.min(roomNum, startRoom);
+        }
         for (int i = 0; i < 4; i++) {
             int nx = x + dx[i];
             int ny = y + dy[i];
-            if (isInner(nx, ny) && !visited[nx][ny]) {
-                if (g[nx][ny] - g[x][y] == 1) {
-                    visited[nx][ny] = true;
-                    DFS(nx, ny, count + 1);
-                    visited[nx][ny] = false;
-                }
+            if (isInner(nx, ny) && g[nx][ny] - g[x][y] == 1) {  // visited[][] 필요없음 ! 어차피 또 방문할 수가 없으니.
+                DFS(nx, ny, count + 1, roomNum);
             }
         }
     }
