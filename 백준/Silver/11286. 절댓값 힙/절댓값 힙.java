@@ -9,18 +9,15 @@ import java.util.StringTokenizer;
 public class Main {
 
     private static class Data implements Comparable<Data>{
-        int rawData;
-        int absData;
-
+        int data;
         Data(int data) {
-            this.rawData = data;
-            this.absData = Math.abs(data);
+            this.data = data;
         }
 
         @Override
         public int compareTo(Data o) {
-            if(this.absData == o.absData) return this.rawData - o.rawData;
-            else return absData - o.absData;
+            if(Math.abs(this.data) == Math.abs(o.data)) return this.data - o.data;
+            else return Math.abs(this.data) - Math.abs(o.data);
         }
     }
     static int n;
@@ -35,7 +32,7 @@ public class Main {
             x = Integer.parseInt(br.readLine());
             if (x == 0) {
                 if(pq.isEmpty()) System.out.println(0);
-                else System.out.println(pq.poll().rawData);
+                else System.out.println(pq.poll().data);
             } else {
                 pq.offer(new Data(x));
             }
