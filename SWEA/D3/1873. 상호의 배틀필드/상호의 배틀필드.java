@@ -61,14 +61,9 @@ public class Solution {
                     }
                 }
             }
-//            System.out.println("=========시작 맵==========");
-//            printMap();
             int cnt = Integer.parseInt(br.readLine());
             String command = br.readLine();  // 명렁어
             solve(command);
-            // 최종위치 교체해줘야함
-//            printMap();
-//            System.out.println("마지막 방향 : " + direction);
             switchChar();
             System.out.print("#" + t + " ");
             printResult();
@@ -165,17 +160,6 @@ public class Solution {
             }
         }
     }
-
-    public static void printMap() {
-        for (int i = 0; i < H; i++) {
-            for (int j = 0; j < W; j++) {
-                System.out.print(g[i][j] + " ");
-            }
-            System.out.println();
-        }
-        System.out.println("========================");
-    }
-
     public static void printResult() {
         for (int i = 0; i < H; i++) {
             for (int j = 0; j < W; j++) {
