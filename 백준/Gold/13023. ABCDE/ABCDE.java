@@ -31,7 +31,7 @@ public class Main {
         for (int i = 0; i < n; i++) {
             visited = new boolean[n];
             visited[i] = true;  // 시작지점 방문처리 후 진행.
-            DFS(1, i);
+            DFS(1, i);   // 깊이를 1부터 시작했어야 함. 왜냐면 현재 노드부터 탐색하는 것이 맞기 때문! -> 그래야 5까지 도달.
             if(flag) break;
         }
 //        System.out.println(flag);
