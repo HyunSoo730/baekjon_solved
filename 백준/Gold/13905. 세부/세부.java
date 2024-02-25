@@ -6,38 +6,49 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.List;
 
 public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
-    private static class Node implements  Comparable<Node>{
-        int index;
+
+    private static class Edge implements Comparable<Edge>{
+        int nodeA, nodeB;
         long distance;
-        Node(int index, long distance){
-            this.index = index;
+
+        Edge(int nodeA, int nodeB, long distance) {
+            this.nodeA = nodeA;
+            this.nodeB = nodeB;
             this.distance = distance;
         }
 
         @Override
-        public int compareTo(Node node) {
-            return Long.compare(node.distance, this.distance);
+        public int compareTo(Edge edge) {
+            return Long.compare(edge.distance, this.distance);
         }
     }
     static int n, m;
-    static long INF = Long.MAX_VALUE;
-    static long[] dis;
-    static ArrayList<ArrayList<Node>> g = new ArrayList<>();
+    static List<Edge> edges = new ArrayList<>();
+    static int[] parent;
 
+    public static int findParent(int x) {
+        if(x == parent[x]) return x;
+        return parent[x] = findParent(parent[x]);
+    }
+
+    public static void unionParent(int a, int b) {
+        a = findParent(a);
+        b = findParent(b);
+        if(a < b) parent[b] = a;
+        else parent[a] = b;
+    }
 
     public static void main(String[] args) throws IOException {
 
         st = new StringTokenizer(br.readLine());
         n = Integer.parseInt(st.nextToken());
         m = Integer.parseInt(st.nextToken());
-        for (int i = 0; i <= n; i++) {
-            g.add(new ArrayList<Node>());
-        }
         st = new StringTokenizer(br.readLine());
         int start = Integer.parseInt(st.nextToken());
         int end = Integer.parseInt(st.nextToken());
@@ -46,40 +57,30 @@ public class Main {
             st = new StringTokenizer(br.readLine());
             int a = Integer.parseInt(st.nextToken());
             int b = Integer.parseInt(st.nextToken());
-            int cost = Integer.parseInt(st.nextToken());
-            g.get(a).add(new Node(b, cost));
-            g.get(b).add(new Node(a, cost));
+            long cost = Integer.parseInt(st.nextToken());
+            edges.add(new Edge(a, b, cost));
         }
 
-        dis = new long[n+1];
-        dijkstra(start);
-        System.out.println(dis[end]);
-
-    }
-
-    // ! 변형 다익스트라 -> 경로 상의 최소 가중치를 최대화 하는 경로를 찾아야함.
-    // ! 시작점에서 각 노드까지 이동하는 경로 중 간선의 최소 가중치가 최대가 되는 경로 찾기.
-    public static void dijkstra(int start) {
-        PriorityQueue<Node> pq = new PriorityQueue<>();
-        pq.offer(new Node(start, INF));
-        dis[start] = INF;
-        while (!pq.isEmpty()) {
-            Node node = pq.poll();
-            int now = node.index;
-            long distance = node.distance; // 시작노드에서 현재 노드까지의 최대 거리
-
-            if(distance < dis[now]) continue;
-            // ! dis에는 최단거리 중 최대값이 들어가 있음
-            for (Node adjNode : g.get(now)) {
-                // ! 경로 상의 간선 가중치 중 최소값이 최대가 되도록 하는 경로를 찾는 문제.
-                long cost = Math.min(dis[now], adjNode.distance);
-                if (cost > dis[adjNode.index]) {
-                    dis[adjNode.index] = cost; // 갱신
-                    pq.offer(new Node(adjNode.index, cost));
-                }
+        // ! 유니온파인트 세팅
+        parent = new int[n+1];
+        for (int i = 1; i <= n; i++) {
+            parent[i] = i;
+        }
+        Collections.sort(edges);  // 최대 비용으로 정렬
+        long res = 0;
+        // ! 간선의 비용이 최대값인 것부터 돌면서 연결되는 순간 가중치의 최소값이 최대화가 되는 시점
+        for (Edge edge : edges) {
+            int nodeA = findParent(edge.nodeA);
+            int nodeB = findParent(edge.nodeB);
+            if (nodeA != nodeB) {
+                unionParent(nodeA, nodeB);
+            }
+            if (findParent(start) == findParent(end)) {
+                res = edge.distance;
+                break;
             }
         }
 
-
+        System.out.println(res);
     }
 }
