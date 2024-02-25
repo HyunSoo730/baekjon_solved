@@ -67,7 +67,7 @@ public class Main {
             parent[i] = i;
         }
         Collections.sort(edges);  // 최대 비용으로 정렬
-        long res = 0;
+        long res = 0; // ! 초기값을 0으로 설정해줬어야 했음.
         // ! 간선의 비용이 최대값인 것부터 돌면서 연결되는 순간 가중치의 최소값이 최대화가 되는 시점
         for (Edge edge : edges) {
             int nodeA = findParent(edge.nodeA);
