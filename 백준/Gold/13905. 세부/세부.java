@@ -21,7 +21,7 @@ public class Main {
 
         @Override
         public int compareTo(Node node) {
-            return Long.compare(node.distance, this.distance); // 오름차순 정렬
+            return Long.compare(node.distance, this.distance);
         }
     }
     static int n, m;
@@ -57,20 +57,22 @@ public class Main {
 
     }
 
+    // ! 변형 다익스트라 -> 경로 상의 최소 가중치를 최대화 하는 경로를 찾아야함.
+    // ! 시작점에서 각 노드까지 이동하는 경로 중 간선의 최소 가중치가 최대가 되는 경로 찾기.
     public static void dijkstra(int start) {
         PriorityQueue<Node> pq = new PriorityQueue<>();
         pq.offer(new Node(start, INF));
         dis[start] = INF;
-        // ! 시작점 거리를 최대로 설정
         while (!pq.isEmpty()) {
             Node node = pq.poll();
             int now = node.index;
             long distance = node.distance; // 시작노드에서 현재 노드까지의 최대 거리
 
             if(distance < dis[now]) continue;
-
+            // ! dis에는 최단거리 중 최대값이 들어가 있음
             for (Node adjNode : g.get(now)) {
-                long cost = Math.min(dis[now], adjNode.distance); // 최대 거리 갱신 로직 변경
+                // ! 경로 상의 간선 가중치 중 최소값이 최대가 되도록 하는 경로를 찾는 문제.
+                long cost = Math.min(dis[now], adjNode.distance);
                 if (cost > dis[adjNode.index]) {
                     dis[adjNode.index] = cost; // 갱신
                     pq.offer(new Node(adjNode.index, cost));
