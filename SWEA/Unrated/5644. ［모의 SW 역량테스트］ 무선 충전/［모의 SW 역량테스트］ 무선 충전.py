@@ -46,21 +46,8 @@ def calMaxPerformance():
 
 
 def move(user, direction):
-    if direction == up:
-        user[0] += dx[up]
-        user[1] += dy[up]
-    elif direction == right:
-        user[0] += dx[right]
-        user[1] += dy[right]
-    elif direction == down:
-        user[0] += dx[down]
-        user[1] += dy[down]
-    elif direction == left:
-        user[0] += dx[left]
-        user[1] += dy[left]
-    elif direction == stay:
-        user[0] += dx[stay]
-        user[1] += dy[stay]
+    user[0] += dx[direction]
+    user[1] += dy[direction]
 
 def maxPerformance():
     global accessA, accessB
