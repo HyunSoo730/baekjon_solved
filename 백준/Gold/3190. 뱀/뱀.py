@@ -1,57 +1,68 @@
 import sys
 from collections import deque
 
+dx = [-1,0,1,0]
+dy = [0,1,0,-1]
+direction = 1 # ! 시작 방향은 오른쪽
 n = int(input())
-k = int(input())
+k = int(input()) # ! 사과 개수
+
 g = [[0] * n for _ in range(n)]
+
 for _ in range(k):
     a,b = map(int, input().split())
-    g[a-1][b-1] = 1 #사과 위치
+    g[a-1][b-1] = 1 # ! 해당 칸에는 사과 존재
 
-L = int(input()) #방향 변환 횟수
-data = []
+move = deque()
+L = int(input())
 for _ in range(L):
-    x,c = input().split()
-    #x초 뒤에 c방향으로 회전
-    data.append((int(x),c))
+    t, d = map(str, input().split())
+    move.append((int(t),d)) # ! 해당 시간에 해당 방향으로 이동
 
-#자기 자신의 몸과 부딪히거나 벽과 부딪혀야 게임 끝.
-g[0][0] = 2 #시작지점 (뱀)
-x = y = 0 #시작위치
-t = 0
-dx = [0,1,0,-1]
-dy = [1,0,-1,0]  #dx,dy는 이동하는 방향.
-direction = 0 #방향 번호
+headX,headY = 0,0 # ! 시작 위치 및 머리 위치
+dq = deque() # ! 뱀의 몸 좌표 저장
+dq.append((headX,headY)) # ! 시작 위치 삽입 후 진행
 
-dq = deque()
-dq.append((0,0)) #뱀의 위치 큐로 관리
+def step1(dir): # ! 해당 방향으로 이동
+    global headX,headY
+    headX += dx[dir]
+    headY += dy[dir]
 
-def turn(c):
-    global direction
-    if c == "L":
-        direction = (direction - 1) % 4
-    else: #오른쪽
-        direction = (direction + 1) % 4
+def step2(): # ! 종료조건인지 확인 : 벽, 자기자신
+    global headX, headY
+    if not (0<= headX < n and 0<= headY < n): #! 범위 벗어나.
+        return False
+    if (headX, headY) in set(dq): # ! 몸통에 부딪힘
+        return False
+    return True
+
+def step3():
+    if g[headX][headY] == 0: # ! 해당 위치 사과 아닌 경우
+        dq.popleft()  # ! 꼬리 부분 제거
+    else: # ! 그렇지 않은 경우 ! 사과 없애야 해
+        g[headX][headY] = 0 # ! 사과 없앰.
+
+def step4(): # ! 해당 시간이 바꿀 시간이라면 바꿔
+    global time, direction
+    if move and time == move[0][0]: # ! 방향 바꿀 시간
+        if move[0][1] == "L": # ! 현재 방향 기준 왼쪽으로 방향 전환\
+            direction = (direction + 3) % 4
+        else:
+            direction = (direction + 1) % 4
+        move.popleft() # ! 앞에꺼 삭제
+
+
+time = 0 # ! 시간
+direction = 1 # ! 시작 방향.
+# print(f"시작 좌표 : ({headX}, {headY})")
 while True:
-    t += 1
-    x += dx[direction]
-    y += dy[direction]
-
-    if x<0 or x>=n or y<0 or y>=n: #벽에 부딪힘
+    step1(direction) # ! 현재 방향으로 이동
+    # print(f"이동 후 좌표 : ({headX}, {headY})")
+    time += 1
+    if not step2(): # ! 종료조건인지 확인
         break
-    if g[x][y] == 1: #사과를 먹음
-        g[x][y] = 2 #뱀의 길이 증가. (머리부분)
-        dq.append((x,y)) #위치 추가
-    elif g[x][y] == 0: #그냥 도로
-        g[x][y] = 2 #머리 이동하고 꼬리는 지우고
-        dq.append((x,y))
-        tx,ty = dq.popleft() #꼬리 부분
-        g[tx][ty] = 0 #다시 도로로 포장.\
-    else:
-        break  #g[x][y] == 2 즉 이미 본인의 몸인 부분과 부딪힘.
+    else: dq.append((headX,headY))
+    step3() # ! 아니라면 해당 칸 사과 확인
+    step4() # ! 방향 바꿀 시간이라면 바꿔
 
-    for a,b in data:
-        if a == t: #회전할 타이밍.
-            turn(b)
-print(t)
-
+print(time)
