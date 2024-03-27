@@ -1,52 +1,53 @@
 import sys
-from collections import deque
 
 
 n,m = map(int, input().split())
-x,y,d = map(int, input().split()) #청소기 시작위치, 처음 바라보는 방향
-#d가 0:북, 1:동, 2:남, 3:서
-g = [list(map(int, input().split())) for _ in range(n)] #nxm 보드판
-#0이면 청소하지 않은 빈칸, 1이면 벽
-#멈출 때까지 청소하는 칸의 개수
-ch = [[0] * m for _ in range(n)]
+nowX,nowY, direction, = map(int, input().split()) # ! 현재 로봇 좌표, 방향
+g = [list(map(int, input().split())) for _ in range(n)]
+# ! (0,0) -> (n-1,m-1) 로 이동하기
+
+up, right, down, left = 0,1,2,3
+
+# ! 청소하지 않은 칸 : 0 벽 : 1
+
 dx = [-1,0,1,0]
-dy = [0,1,0,-1] #북 동 남 서 순으로 방향벡터 적용
+dy = [0,1,0,-1]
 cnt = 0
-while True:
-    if g[x][y] == 0 and ch[x][y] == 0:
-        ch[x][y] = 1 #방문처리 -> 방문한 빈칸
+
+def DFS(x,y):
+    global cnt, direction
+    global nowX, nowY
+
+    # ! step1
+    if g[x][y] == 0:
+        g[x][y] = 2 # ! 방 청소 처리
         cnt += 1
-
     flag = False
-    for i in range(4):
-        nx = x + dx[i]
-        ny = y + dy[i]
-        if g[nx][ny] == 0 and ch[nx][ny] == 0:
+    d = direction
+    for i in range(4): # ! 시계방향으로 돌면서 확인
+        d = (d + 3) % 4
+        nx = x + dx[d]
+        ny = y + dy[d]
+        if 0<=nx<n and 0<=ny<m and g[nx][ny] == 0:
             flag = True
-            #청소되지 않은 빈칸 존재
             break
 
-    if flag == False: #방문 불가면 후진
-        temp = (d + 2) % 4 #바라보는 방향은 유지.
-        tx = x + dx[temp]
-        ty = y + dy[temp]
-        if 0<=tx<n and 0<=ty<m and g[tx][ty] == 0: #후진 가능 방문했는지는상관없음.
-            x,y = tx,ty
-            continue
+    # ! d에 대해서 실행.
+    if flag:
+        direction = d
+        nx = x + dx[direction]
+        ny = y + dy[direction]
+        if 0<=nx<n and 0<=ny<m and g[nx][ny] == 0:
+            DFS(nx,ny)
         else:
-            break
-    else: #방문 가능
-        d = (d+3) % 4 #반시계 이동후
-        tx = x + dx[d]
-        ty = y + dy[d]
-        if 0<=tx<n and 0<=ty<m and g[tx][ty] == 0 and ch[tx][ty] == 0:
-            x,y = tx,ty
+            DFS(x,y)
+    else: # ! 이동 불가능 -> 여기서는 그냥 빈칸도 이동 가능
+        nx = x - dx[direction]
+        ny = y - dy[direction]
+        if 0<=nx<n and 0<=ny<m and g[nx][ny] != 1:
+            DFS(nx,ny) # ! 후진
+        else:
+             return # ! 후진 안되면 끝.
 
-
+DFS(nowX, nowY)
 print(cnt)
-
-
-
-
-
-
