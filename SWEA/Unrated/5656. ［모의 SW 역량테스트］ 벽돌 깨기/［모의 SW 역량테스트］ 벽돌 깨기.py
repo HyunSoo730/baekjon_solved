@@ -4,70 +4,78 @@ from collections import deque
 dx = [-1,0,1,0]
 dy = [0,1,0,-1]
 
-def destroy(x,y,g):
-    # ! 해당 행 , 열 기준으로 폭파 시작
+def isInner(x,y):
+    if 0<=x<h and 0<=y<w:
+        return True
+    return False
+def BFS(x,y,power,board): # ! 해당 보드의 x,y에서부터 폭탄 터지기 시작
+    board[x][y] = 0 # ! 시작좌표 역시 0으로 만들고 진행
     dq = deque()
-    dq.append((x,y, g[x][y]))
-    g[x][y] = 0 # ! 폭파 처리
+    dq.append((x,y,power))
     while dq:
-        x,y,power = dq.popleft() # ! 폭파해야할 위치, 범위
-        for d in range(1,power):
+        x,y,level = dq.popleft() # ! 폭탄이 터질 좌표 + 폭탄 범위
+        for d in range(1,level): # level가 1이면 본인 자리만 터지는게 맞으므로 이렇게 표현
             for i in range(4):
                 nx = x + dx[i] * d
                 ny = y + dy[i] * d
-                if 0<=nx<h and 0<=ny<w and g[nx][ny] > 0: # ! 좌표 내부이면서 폭탄인 경우
-                    dq.append((nx,ny, g[nx][ny])) # ! 연쇄 작용 진행
-                    g[nx][ny] = 0
+                if isInner(nx,ny) and board[nx][ny] > 0: # ! 벽돌이 존재하는 곳이라면
+                    dq.append((nx,ny,board[nx][ny]))
+                    board[nx][ny] = 0
 
-def step1(y, g): # ! 해당 열 폭파
+def print_board(board):
     for x in range(h):
-        if g[x][y] >= 1: # ! 폭탄이라면
-            destroy(x,y,g)
-            break
+        for y in range(w):
+            print(board[x][y], end = " ")
+        print()
 
-def step2(g): # ! 벽돌 제거한 상태에서 빈칸 메우기 -> 아래와 같이 해도 되고 deque를 사용해서 해도 되고.
-    # ! 어찌됐든, 남아있는 것들을 먼저 채우고 빈칸을 채우는 개념을 사용했어야 했음.
+def reboard(board):
     for y in range(w):
         temp = []
         for x in range(h):
-            if g[x][y] > 0:
-                temp.append(g[x][y])
-        temp = [0] * (h-len(temp)) + temp # ! 남은 공간은 0으로 채움
+            if board[x][y] > 0:
+                temp.append(board[x][y])
+        new_list = [0] * (h-len(temp)) + temp
+        for i in range(h):
+            board[i][y] = new_list[i]
+    # print("보드 중력 적용 후 출력")
+    # print_board(board)
+
+def DFS(L,board): # ! 해당
+    global res
+    if L == n: # ! 모든 폭탄을 다 떨어트린 경우
+        # ! 남은 개수 구하기
+        cnt = 0
         for x in range(h):
-            g[x][y] = temp[x]
-
-def step3(g): # ! 해당 벽돌의 남은 벽돌 개수
-    cnt = 0
-    for i in range(h):
-        for j in range(w):
-            if g[i][j] >= 1:
-                cnt += 1
-    return cnt
-
-def DFS(L, g):
-    global minCnt
-    if L == n: # !n번 모두 떨어뜨림
-        cnt = step3(g) # ! 남은 블록 개수
-        minCnt = min(minCnt, cnt)
-    else: # ! 떨어뜨릴 위치 선택
-        # * 먼저 맵 복사
-        for i in range(w): # ! 0~w-1까지
-            temp = [arr[:] for arr in g] # ! 현재 맵 복사 후 폭파 진행 (각 열에 대해 폭파를 시도할 때마다 원본 맵의 상태를 유지한 채로 새로운 시도를 해야함)
-            step1(i, temp) # ! 해당 열 폭파 진행
-            step2(temp)
-            DFS(L+1, temp) # ! 다음  폭발로 이동
-
-def printArray(g):
-    for x in g:
-        print(x)
+            for y in range(w):
+                if board[x][y] > 0:
+                    cnt += 1
+        res = min(res, cnt)
+    else:
+        for y in range(w):
+            g = [arr[:] for arr in board] # ! 배열 복사 후 진행
+            # print_board(g)
+            a,b = 0,0
+            flag = False
+            for x in range(h): # ! 행 순차적으로 탐색하면서 처음으로 만나는 벽돌 좌표 구하기
+                if g[x][y] > 0: # ! 벽돌 발견
+                    flag = True
+                    a,b = x,y
+                    break
+            # 폭탄 투하
+            if flag:
+                BFS(a,b,g[a][b], g) # ! 해당 보드에 폭탄 투하
+            # ! 폭탄 투하가 끝나면 보드를 원상복구 시키고 넘기기
+            reboard(g)
+            DFS(L+1,g)
 
 
 T = int(input())
 for t in range(1,T+1):
-    n,w,h = map(int, input().split()) # ! 구슬 떨어뜨리는 횟수, 너비, 높이
-    g = [list(map(int, input().split())) for _ in range(h)]
-    # ! 1. 떨어뜨리는 위치 선택
-    minCnt = int(1e9)
-    DFS(0, g)
+    n,w,h = map(int, input().split()) # ! n개의 벽돌 떨어뜨리기, wxh 크기 배열
+    board = [list(map(int, input().split())) for _ in range(h)]
+    cnt = 0
+    res = int(1e9)
+    DFS(0,board)
 
-    print(f"#{t} {minCnt}")
+    print(f"#{t} {res}")
+
