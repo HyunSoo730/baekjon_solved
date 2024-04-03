@@ -1,48 +1,75 @@
-from collections import defaultdict, deque
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
 
 
+public class Solution {
 
-def BFS(v, g):
-    cnt = 0
-    dq = deque()
-    dq.append(v)
-    visited = [False] * (n+1)
-    while dq:
-        node = dq.popleft()
-        for x in g[node]:
-            if not visited[x]:
-                visited[x] = True
-                dq.append(x)
-                cnt += 1
-    return cnt
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
 
-T = int(input())
-for t in range(1,T+1):
-    n = int(input()) # 학생 수
-    m = int(input()) #  키 비교 횟수
-    g = defaultdict(list)
-    reverse_g = defaultdict(list)
-    for _ in range(m):
-        a,b = map(int, input().split())
-        g[b].append(a)
-        reverse_g[a].append(b)
+    static int T,n,m,a,b;
+    static List<List<Integer>> g,reverse_g;
+    static StringBuilder sb = new StringBuilder();
+    public static void main(String[] args) throws IOException {
+        T = Integer.parseInt(br.readLine());
+        for (int t = 1; t <= T; t++) {
+            n = Integer.parseInt(br.readLine());
+            m = Integer.parseInt(br.readLine());
+            g = new ArrayList<>();
+            reverse_g = new ArrayList<>();
+            for (int i = 0; i <= n; i++) {
+                g.add(new ArrayList<Integer>());
+                reverse_g.add(new ArrayList<Integer>());
+            }
+            for (int i = 0; i < m; i++) {
+                st = new StringTokenizer(br.readLine());
+                a = Integer.parseInt(st.nextToken());
+                b = Integer.parseInt(st.nextToken());
+                g.get(b).add(a);
+                reverse_g.get(a).add(b);
+            }
 
-    # 본인을 통해 나가는 개수를 확인
-    cnt = [0] * (n+1)
-    reverse_cnt = [0] * (n+1)
+            int[] cnt = new int[n+1];
+            int[] reverse_cnt = new int[n+1];
 
-    # 진출 차수에 대해서
-    for v in range(1,n+1):
-        cnt[v] = BFS(v,g)
-    # 진입 차수에 대해서
-    for v in range(1,n+1):
-        reverse_cnt[v] = BFS(v,reverse_g)
+            for (int v = 1; v <= n; v++) {
+                cnt[v] = BFS(v,g);
+                reverse_cnt[v] = BFS(v, reverse_g);
+            }
 
-    # print(f"진출차수 개수 = {cnt[1:]}")
-    # print(f"진입차수 개수 = {reverse_cnt[1:]}")
+//            System.out.println(Arrays.toString(cnt));
+//            System.out.println(Arrays.toString(reverse_cnt));
 
-    res = 0
-    for v in range(1,n+1):
-        if cnt[v] + reverse_cnt[v] == n-1:
-            res += 1
-    print(f"#{t} {res}")
+            int res = 0;
+            for (int v = 1; v <= n; v++) {
+                if (cnt[v] + reverse_cnt[v] == n - 1) {
+                    res += 1;
+                }
+            }
+            sb.append("#").append(t).append(" ").append(res).append("\n");
+        }
+        System.out.println(sb);
+    }
+
+    public static int BFS(int v, List<List<Integer>> g) {
+        Deque<Integer> dq = new ArrayDeque<>();
+        dq.offer(v);
+        boolean[] visited = new boolean[n+1];
+        int cnt = 0;
+        while (!dq.isEmpty()) {
+            int now = dq.poll();
+            for (Integer node : g.get(now)) {
+                if (!visited[node]) {
+                    visited[node] = true;
+                    dq.offer(node);
+                    cnt += 1;
+                }
+            }
+        }
+        return cnt;
+    }
+
+
+}
