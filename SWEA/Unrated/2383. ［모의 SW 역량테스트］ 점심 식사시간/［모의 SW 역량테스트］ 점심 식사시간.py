@@ -1,118 +1,80 @@
+import heapq
 from collections import deque
 
-def step1(): # ! 계단 입구까지 이동거리 계산
-    global dis, data
-    dis = [0] * len(person)
-    data = []
-    for i in range(len(person)):
-        idx = select[i] # ! i번째 사람이 선택한 계단의 인덱스
-        px,py = person[i][0], person[i][1] # ! 사람의 위치
-        sx,sy, length = stairs[idx]
-        distance = abs(px-sx) + abs(py-sy)
-        dis[i] = distance
-        data.append((idx, distance, length)) # ! 어떤 계단을 이용하는지, 해당 계단까지 거리, 해당 계단 길이
-
-
-def step2():
-    global minDis
-    time = 0  # 현재 시간
-    finish_count = 0  # 계단을 내려간 사람 수
-    on_stairs = [deque() for _ in range(2)]  # 각 계단을 내려가고 있는 사람들
-    waiting = [[] for _ in range(2)]  # 각 계단에 대기 중인 사람들
-
-    while finish_count < len(person):
-        # 계단을 내려가고 있는 사람 처리
-        for i in range(2):
-            if on_stairs[i]: # ! 내려가고 있는 사람 존재.
-                updated = deque()
-                for p_time in on_stairs[i]: # ! 각 계단
-                    if time - p_time < stairs[i][2]:  # 아직 내려가는 중인 경우
-                        updated.append(p_time)
-                    else:
-                        finish_count += 1  # 계단을 내려갔으므로 카운트 증가
-                on_stairs[i] = updated
-
-        # 대기 중인 사람 계단으로 이동
-        for i in range(2):
-            while waiting[i] and len(on_stairs[i]) < 3:  # 해당 계단에 여유가 있고, 대기자가 있는 경우
-                p_idx = waiting[i].pop(0) # ! 대기중인 사람의 인덱스
-                if dis[p_idx] <= time:  # 계단에 도착한 경우
-                    on_stairs[i].append(time)  # 계단 내려가기 시작 시간 기록
-        # 각 사람별로 대기열에 추가
-        for i, (idx, distance, length) in enumerate(data):
-            if distance == time:  # 계단에 도착한 경우
-                waiting[idx].append(i)  # 해당 계단(idx)의 대기열에 해당 사람(i) 추가
-
-
-        time += 1  # 시간 증가
-
-    minDis = min(minDis, time)  # 모든 사람이 내려간 시간 중 최소값 업데이트
-
-
-def step_2():
-    global minDis
-    time = 0
-    finishCount = 0
-    onStairs = [deque() for _ in range(2)] # ! 해당 계단 내려가고 있는 사람
-    wait = [deque() for _ in range(2)] # ! 해당 계단 대기하는 사람
-
-    while finishCount < len(person): # ! 모두 끝날때까지 진행
-        # ! 1. 계단 내려가고 있는 사람 먼저 처리
-        for i in range(2):
-            if onStairs[i]: # ! 해당 계단 내려가는 사람 존재
-                temp = deque() # ! 계단 내려간 사람 제외하고 계속 내려간 사람들만 넣기 위해
-                for p_time in onStairs[i]: # ! 계단 내려가기 시작한 시간
-                    if time - p_time < stairs[i][2]: # ! 아직 내려가는 중. 0이되는 순간 다 내려간거잖아.
-                        temp.append(p_time)
-                    else:
-                        finishCount += 1  # ! 끝났으면 카운트 추가하고 temp에 넣지 않아
-                onStairs[i] = temp # ! 다시 갈아끼워 (남은 애들만)
-
-        # ! 2. 대기하는 사람들 계단으로 이동 (자리가 있는 경우만)
-        for i in range(2): # ! 각 계단 별 대기하는 사람들 확인
-            while wait[i] and len(onStairs[i]) < 3: # ! 해당 계단에 여유 있고 대기자 존재
-                personIdx = wait[i].popleft() # ! 가장 먼저 대기한 애 꺼내서
-                if dis[personIdx] <= time: # ! 사실 당연한 조건 . 계단에 도착한 시간이 현재 시간보다 같거나 작은 경우만.
-                    onStairs[i].append(time) # ! 사람이 계단에 도착한 경우. 해당 사람을 계단을 내려가는 것으로 변경. 해당 사람이 계단을 내려가기 시작한 시간을 기록.
-
-        # ! 3. 현재시간 같아지면 이용하는 계단에 현재 사람 대기열에 추가
-        for p_idx, (stairIdx, distance, length) in enumerate(data):
-            if time == distance: # ! 계단에 도착한 경우
-                wait[stairIdx].append(p_idx) # ! 해당 계단에 사람 인덱스 추가
-        time += 1
-    minDis = min(minDis, time)
-
+# 게단의 입구까지 이동하는 시간 + 계단을 내려가는데 걸리는 시간
+# 각 계단 최대 3명
+# 만약 3명 이용 중이라면 한 명이 계단을 다 내려갈 때까지 기다려야 한다.
+#  먼저 각 사람 별로 어느 계단으로 갈지 부분집합.
+# 그 후 계산 시작.
+# step1
+# 각 사람들 어느 계단으로 갈지 정한 후
+# 모두 선택 후 시간 별로 정렬 각 계단별 큐에 넣어서 3명 이하면 가장 마지막 도착시간 + 1
+# 3명이 넘어가면 첫번째에서 꺼내서 해당 사람과 새롭게 들어갈 사람 시간이 더 큰 사람 넣어주기
 
 def DFS(L):
-    global minDis
-    if L == len(person): # ! 모두 확인
-        # ! 모든 사람이 계단을 선택했으니 이제 각 계단별 이동거리 진행
-        # print("select : ", end = " ")
-        step1()
-        step_2()
+    global res
+    if L == len(person): # 모든 사람 확인
+        # 이제 각 계단 별로 확인
+        dataA = []
+        dataB = []
+        for i in range(len(person)):
+            if check[i] == 0: # 현재 사람은 첫번째 계단 선택
+                t = abs(person[i][0] - stairs[0][0]) + abs(person[i][1] - stairs[0][1]) # 계단까지 도착하는 시간
+                heapq.heappush(dataA, t) # 최소힙으로 저장
+            else:
+                t = abs(person[i][0] - stairs[1][0]) + abs(person[i][1] - stairs[1][1])
+                heapq.heappush(dataB, t)
 
+        # 각 사람별 계단에 도착한 시간을 작은 순서로 정렬하여 힙큐에 저장.
+        resA = deque()
+        resB = deque() # 계단을 오르는 사람을 저장할 배열
+        while dataA:
+            t = heapq.heappop(dataA)
+            if len(resA) < 3: # 계단 오를 수 있으면 그냥 넣어
+                resA.append(t)
+            else: # 계단 오르는 사람 3명
+                first = resA.popleft() # 가장 먼저 오르고 있는 사람을 꺼내서 해당 사람이 끝나느 시간과 새롭게 계단을 오르려는 사람의 시간 중 큰값으로 다시 넣어야함
+                if first + stairs[0][2] > t: # 현재 오르고 있는 사람이 계단에 도착한 사람보다 크면 대기해야 하므로
+                    resA.append(first + stairs[0][2]) # 첫번째 사람이 끝나는 시간이 현재 계단에 도착한 사람이 오르기 시작하는 시간이므로
+                else:
+                    resA.append(t)
+        while dataB:
+            t = heapq.heappop(dataB)
+            if len(resB) < 3:
+                resB.append(t) # 오를 수 있음
+            else:
+                first = resB.popleft()
+                if first + stairs[1][2] > t:
+                    resB.append(first + stairs[1][2])
+                else:
+                    resB.append(t)
+        resultA = resultB = 0
+        if len(resA) > 0:
+            resultA = resA.pop() + stairs[0][2] + 1 # 1분 대기하는 시간까지 계산
+        if len(resB) > 0:
+            resultB = resB.pop() + stairs[1][2] + 1
+        result = max(resultA, resultB)
+        res = min(res, result)
     else:
-        select[L] = 0
+        check[L] = 0 # 첫번째 계단으로 선택
         DFS(L+1)
-        select[L] = 1
+        check[L] = 1 # 두번째 계단으로 선택
         DFS(L+1)
 
 T = int(input())
 for t in range(1,T+1):
     n = int(input())
     g = [list(map(int, input().split())) for _ in range(n)]
-
     person = []
-    stairs = [] # ! 계단은 무조건 2개
+    stairs = []
     for i in range(n):
         for j in range(n):
-            if g[i][j] == 1: # ! 사람인 경우
-                person.append((i,j))
-            elif g[i][j] > 1: # ! 계단인 경우
-                stairs.append((i,j,g[i][j]))
-    select = [0] * len(person) # ! 각 사람별 선택한 계단의 인덱스
-    dis = [0] * len(person) # ! 각 사람별 이동 시간 저장할 리스트
-    data = []
-    minDis = int(1e9)
+            if g[i][j] == 1: # 사람
+                person.append((i,j)) # 사람 좌표
+            if g[i][j] > 1: # 계단
+                stairs.append((i,j, g[i][j])) # 계단 좌표, 계단 길이
+
+    check = [0] * len(person)
+    res = int(1e9) # 맥스로 설정
     DFS(0)
-    print(f"#{t} {minDis-1}")
+    print(f"#{t} {res}")
