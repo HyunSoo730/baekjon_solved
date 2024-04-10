@@ -1,64 +1,54 @@
-def step1(g): # 있는 그대로의 상태에서 가능한지 확인
-    result = True
-    # 각 열들을 확인 -> 열 고정
-    for y in range(m):
-        if not result:
-            break
-        end = 0
-        flag = False
-        for x in range(n): # x를 차례대로 증가시키면서 확인
-            cnt = 0 # 시작 개수 0
-            while end < n and g[x][y] == g[end][y]: # 인덱스가 범위 내부에 있으면서 계속 같을 때까지
+
+# 보호필름 세로 D, 가로 W 크기
+# 각 셀은 특성 A , B 둘 중 하나 특성 A는 0으로, B는 1로 표시
+# 보호 필름의 성능 검사하기 위해 합격 기준 K
+# 단면의 모든 세로 방향에 대해서 동일한 특성의 셀들이 K개 이상 연속적으로 있는 경우에만 성능검사 통과
+# 즉 각 열 별로 동일한 특성이 K개 이상 있는지 판단
+
+# 성능 검사 통과를 위해 약품 사용
+# 약품은 사용한 행에 모든 특성을 하나로 변경 즉 특정 행 특성을 A 또는 B로 다 변경 가능
+
+# 구하고자 : 약품 투입횟수 최소로 하면서 성능검사 통과할 수 있는 방법. 이때의 약품 투입 횟수
+# -> 전부 다 해봐야함. 완탐 -> 근데 하나씩 다 해보면서 진행. 안될 때 그 이전 시점으로 돌아와서 다시 실행
+# DFS로 진행해야 한다
+
+def check(g): # 현재 보드 통과하는지
+    for j in range(m):
+        flag = False # 해당 열이 가능한지
+        for start in range(n): # 열 고정, 행 내려가면서 검사
+            cnt = 0
+            end = start
+            while end < n and g[end][j] == g[start][j]:
                 cnt += 1
-                end += 1
-            if not flag and cnt >= k:
+                end += 1 # 한칸씩 전진
+            if not flag and cnt >= k: # 해당 열은 통과
                 flag = True
-                break # 가능한 경우가 나오면 현재 열은 끝내도 돼
-        if not flag:
-            result = False
-            break
+                break # 해당 열은 가능하니까 바로 끝
+        if not flag: # 현재 보드 통과 못함
+            return False
+    else:
+        return True # 전체 다 돌았다는 건 가능하다.
 
-    return result
-
-def makeCell(x,g,val):
-    for y in range(m):
-        g[x][y] = val # 하나로 쭉 밀기
-
-def DFS(L,start,g): # 매 순간 확인, 현재 g의 상황에서 가능한지, L은 현재 약품 투약 횟수
+def DFS(start, L, g): # 보드는 계속 가지고 다녀야함
     global res
-    if L > res:
-        return # 가지치기
-    if step1(g):  # 가능
-        res = min(res, L) # 갱신
-    else: # 현재 통과하지 못한다면 약품 투약 진행
-        for i in range(start,n): # 조합으로 계속 진행 -> 현재 행에 대해
-            for j in range(2): # 0 1 특성 2개 -> 약품 투약
-                copy_g = [arr[:] for arr in g] # 복사
-                makeCell(i, copy_g, j)
-                # print(f"{i}번째 행 {j}로 약품 투입 후 결과")
-                # print("=====================")
-                # printBoard(copy_g)
-                DFS(L+1, i+1, copy_g)
+    if L >= res: return  # 가지치기
+    if check(g): # 가능하다
+        res = min(res, L)
+    else: # 안된다면 이제 약품 투입
+        for x in range(start, n): # start행부터 n-1행까지 특정 행 선택해서. 조합인 이유는 위에서 설명
+            for i in range(2): # 특성 A, B둘 다 해봐야
+                copy_g = [arr[:] for arr in g]
+                for y in range(m):
+                    copy_g[x][y] = i
+                DFS(x+1, L+1, copy_g)
+                # 백트랙킹 시 원상복구는 반복문 돌면 다시 배열복사 하기 떄문에 안해도 된다.
 
-def printBoard(g):
-    for i in range(n):
-        for j in range(m):
-            print(g[i][j] , end = " ")
-        print()
 
 T = int(input())
 for t in range(1,T+1):
-    n,m,k = map(int, input().split()) # 행, 열, 통과 기준
+    n,m,k = map(int, input().split()) # 필름 크기, 합격기준 k
     g = [list(map(int, input().split())) for _ in range(n)]
-    # 특성은 0 1 2가지
-    result = step1(g) # 있는 그대로의 상태에서 기준 통과하는지 확인
-    INF = int(1e9)
-    res = INF
-    if result:
-        print(f"#{t} 0")
-    else:
-        DFS(0,0,g)
-        if res == INF:
-            print(f"#{t} {res}")
-        else:
-            print(f"#{t} {res}")
+    res = int(1e9)
+    DFS(0,0,g)
+
+    print(f"#{t} {res}")
