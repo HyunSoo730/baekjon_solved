@@ -22,7 +22,7 @@ def DFS(L, dir,x,y,visited): # 현재 방향도 함께. 현재 방향 기준 직
         return
     if dir == 3 and (i,j) == (x,y): # 돌아온 경우
         res = max(res, L)
-    else:
+    else: # 아직 방향전환을 모두 이루지 못함.
         for d in range(2): # 방향 2개만 고려해도 됨
             direction = (dir + d) % 4 # 없을 수도 있으니 일단은 이렇게 진행.
             nx = x + dx[direction]
@@ -40,11 +40,9 @@ for t in range(1,T+1):
     n = int(input())
     g = [list(map(int, input().split())) for _ in range(n)]
 
-    res = -1
+    res = -1 # 안되는 경우를 미리 넣어둠.
     for i in range(n):
         for j in range(n):
-            # 시작좌표는 다시 돌아와야 하므로 ! 방문처리하지 않아.
-            visited = [[False] * n for _ in range(n)]
-            DFS(0,0,i,j,[])
+            DFS(0,0,i,j,[]) # 이 문제의 경우는 방문을 값을 통해 하기 때문에 리스트를 파라미터로 넘겨줌
 
     print(f"#{t} {res}")
