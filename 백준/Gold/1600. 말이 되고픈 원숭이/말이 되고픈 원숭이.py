@@ -2,63 +2,66 @@ import sys
 from collections import deque
 
 
-k = int(input())  # k번 말처럼 점프 가능
-w, h = map(int, input().split())  # 가로, 세로
-g = [list(map(int, input().split())) for _ in range(h)]
-endX, endY = h - 1, w - 1
+# 말 : 이동방향 8가지, 말로 움직이면 장애물 뛰어넘을 수 있다.
+# 원숭이는 k번만 말처럼 이동 가능 그 외는 4방 탐색.
+# (0,0) -> (h-1,w-1)  최소횟수로 이동 -> 최단거리 : 다익스트라
+# 보드의 각 칸, 0은 이동가능 1은 장애물(벽)
+
+k = int(input())  # 말처럼 이동가능 횟수
+m,n = map(int, input().split())  # 보드 크기
+g = [list(map(int, input().split())) for _ in range(n)]
+
 INF = int(1e9)
-# 기본 이동
+dis = [[[INF] * (k + 1) for _ in range(m)] for _ in range(n)]  # 최단거리 기록
+# k+1로 한 것은 k번까지 가능하기 때문
+
 dx = [-1, 0, 1, 0]
 dy = [0, 1, 0, -1]
 
-# 말처럼 이동
-hx = [-2, -1, 1, 2, 2, 1, -1, -2]
-hy = [1, 2, 2, 1, -1, -2, -2, -1]
-
-
+hx = [-2, -2, -1, -1, 1, 1, 2, 2]
+hy = [-1, 1, -2, 2, -2, 2, -1, 1] # 말처럼 이동
 def isInner(x, y):
-    if 0 <= x < h and 0 <= y < w:
+    if 0 <= x < n and 0 <= y < m:
         return True
     return False
 
-
-dis = [[[INF] * w for _ in range(h)] for _ in range(k + 1)]  # 뛴 횟수를 표현하려면 3차원 배열 필요.
-# 그런데 아예 안 뛴경우가 0 k번까지 가능하다고 했으니 k 즉 k+1개만큼으로 표시할 수 있다.
-
-res = int(1e9)
-
+startX,startY = 0,0
+endX,endY = n-1,m-1 # 도착점
 
 def BFS(a, b):
     global res
     dq = deque()
-    dq.append((a, b, 0, 0))  # 현재 좌표, 현재 경로의 길이, 현재 말처럼 뛴 횟수
+    dq.append((a, b, 0, 0))  # 시작좌표, 현재 경로의 거리, 말처럼 이동한 횟수 기억
 
     while dq:
-        x, y, d, cnt = dq.popleft()  # 현재 좌표, 현재까지의 이동거리 확인
-        if x == endX and y == endY:
-            if d < res:
-                # print(f"현재 좌표 : {x,y} 말처럼 뛰기 횟수: {cnt} 값 : {d}")
-                res = d
-                continue
+        x, y, t, cnt = dq.popleft()  # 현재 위치, 현재 경로의 길이, 말처럼 이동한 횟수
+        if (x,y) == (endX, endY): # 도착점 도달
+            res = min(res, t) # 최단거리 갱신
+            continue # 도착점 도달하고는 더이상 하면 안됨.
+        # 현재 위치에서 기본 이동, 말처럼이동 다 따져보기
         for i in range(4):
             nx = x + dx[i]
             ny = y + dy[i]
-            if isInner(nx, ny) and g[nx][ny] == 0:  # 이동 가능
-                if d + 1 < dis[cnt][nx][ny]:
-                    dis[cnt][nx][ny] = d + 1
-                    dq.append((nx, ny, d + 1, cnt))
-        for i in range(8):  # 말처럼 이동
+            if not isInner(nx, ny):  # 내부 좌표 아니면 안돼
+                continue
+            if g[nx][ny] == 0:  # 이동가능
+                if t + 1 < dis[nx][ny][cnt]:  # 현재 말로 이동한 횟수에서의 최단거리보다 작다면
+                    dis[nx][ny][cnt] = t + 1
+                    dq.append((nx, ny, t + 1, cnt))
+        for i in range(8):
             nx = x + hx[i]
             ny = y + hy[i]
-            if isInner(nx, ny) and g[nx][ny] == 0:  # 이동 가능
-                if cnt < k:
-                    if d + 1 < dis[cnt + 1][nx][ny]:
-                        dis[cnt + 1][nx][ny] = d + 1
-                        dq.append((nx, ny, d + 1, cnt + 1))
+            if not isInner(nx,ny):
+                continue # 내부 좌표 아니면 다시
+            if g[nx][ny] == 0: # 말처럼 뛰었을 때 이동가능. 근데 횟수가 남아있는지 확인
+                if cnt < k: # 말처럼 이동 가능
+                    if t + 1 < dis[nx][ny][cnt + 1]: # 말처럼 이동 + 1의 보드에서 최단거리 갱신 가능
+                        dis[nx][ny][cnt + 1] = t + 1
+                        dq.append((nx,ny,t + 1 , cnt + 1))
 
 
-BFS(0, 0)
-
+res = int(1e9)
+BFS(startX, startY)
 if res == INF:
     print(-1)
 else:
