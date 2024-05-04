@@ -78,12 +78,12 @@ while True:
             if not visited[i][j] and g[i][j] > 0:
                 BFS(i,j)
                 cnt += 1
-    if cnt > 1: # 2덩어리 이상 -> 끝
-        break
-    elif cnt == 1: # 1덩어리 -> 녹이기 과정 진행
-        res += 1
-        녹이기()
-    else:
+    if cnt == 0: # 여기로 온다면 바로 나눠지는 것 없이 끝난다는 것
         res = 0
         break
+    elif cnt > 1: # 두 덩어리 이상으로 나눠진다면
+        break
+    else: # cnt == 1일 때는 계속 진행
+        res += 1
+        녹이기()
 print(res)
