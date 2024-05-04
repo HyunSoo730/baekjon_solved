@@ -1,47 +1,58 @@
 
-# nxn 벌통, 각각의 칸은 벌통의 꿀의 양.
-# 최대한 많은 수익 얻기.
-# 두 명의 일꿀. 각각 가로로 연속되도록 M개의 벌통 선택. 선택한 벌통에서 꿀 채취
-# 두 명은 서로 겹치면 안됨.
-# 각 일꾼들은 선택한 벌통서 꿀 채취 -> 최대 C까지 채취 # 넘어가면 그 중 일부만.
-# 구하고자 : 두 일꾼이 꿀을 채취하여 얻을 수 있는 수익의 합이 최대가 되는 경우. 그때의 수익
 
-# 일단. 두 일꾼이 시작 좌표부터 픽스.
-# 선택한 M개 벌통 중 모든 경우의 수 확인해서 C를 넘지 않는 최대 값 찾기 -> 부분집합
+# nxn 맵, 각 칸은 각각의 벌통에 있는 꿀의 양 나타냄. 꿀의 양 다를 수 있음
+# 최대한 많은 꿀의 양 채취하기
+# 2명의 일꾼들이 각각 채취할 수 있는 벌통의 수 m 존재
+# 가로로 연속되도록 m개의 벌통 선택. 선택한 벌통에서 꿀 채취 가능, 2명의 일꾼이 선택한 벌통 겹치면 안됨
+# 두 일꾼이 채취할 수 있는 꿀의 최대 양 C
 
-def DFS(L, sum_data, value,x,y):
+# 벌통들의 크기 n, 벌통들 정보 g, 선택할 수 있는 개수 m, 꿀을 채취할 수 있는 최대 양 C
+# 최대로 얻을 수 있는 수익의 합 찾기 : 수익 : 꿀을 채취할 수 있는 경우 제곱의 합으로 구하기
+
+# 1. 첫번쨰 사람 먼저 벌통 선택.
+# 첫번째 사람의 채취 시작 위치를 먼저 정하기 (무조건 가로로 m개 선택)
+# 행은 처음부터 끝까지, 열은 n-m까지 가능. (n-m부터 m개 선택 시 n-1이니까)
+# 2. 두번째 사람 선택.
+# 두번째 사람은 첫번째 사람이 선택한 이후부터 선택을 진행
+
+def DFS(L, x, y, sum_data, 수익):  # 벌꿀 채취 위지, 현재까지의 벌꿀 합 (c보다 작아야), 수익
     global res
-    if sum_data > c:
+    if sum_data > c:  # 최대치 초과 시 안됨
         return
-    if L == m: # m개 모두 확인
-        res = max(res, value)
+    if L == m:  # 시작위치로부터 m개 채취 확인 완료
+        res = max(res, 수익)
     else:
-        DFS(L+1, sum_data + g[x][y+L], value + g[x][y+L] ** 2, x, y)
-        DFS(L+1, sum_data, value, x,y)
+        DFS(L + 1, x, y + 1, sum_data + g[x][y], 수익 + g[x][y] ** 2)  # 이번 꿀통 채취함.
+        DFS(L + 1, x, y + 1, sum_data, 수익)  # 이번 꿀통 채취 안함
+
 
 T = int(input())
-for t in range(1,T+1):
-    n,m,c = map(int, input().split()) # 별통 크기 n, 채취하는 가로 길이 m, 최대 양 C
+for t in range(1, T + 1):
+    n, m, c = map(int, input().split())
     g = [list(map(int, input().split())) for _ in range(n)]
-    # 일꾼 1부터 시작 위치 픽스
-    sumA = sumB = 0
-    result = 0
-    for x in range(n):
-        for y in range(n-m+1): # 즉 가장 마지막 좌표부터 m개 채취해야 하므로
-            # (x,y)가 일꾼 1의 시작 위치
+
+    # 1. 첫번째 사람부터 선택
+    res = 0
+    resA = 0
+    resB = 0
+    최종수익 = 0
+    for i in range(n):
+        for j in range(n - m + 1):  # n-m까지는 벌통을 선택하는 시작위치로 가능
+            # (i,j)부터 m개의 벌통 선택. 그중 최대값 갱신하고 2번쨰 사람 선택 가능
             res = 0
-            DFS(0, 0, 0,x,y) # 현재 위치도 함께
-            sumA = res # 기억
-            # 일꾼1에 대한 최대값 구했으니 일꾼2의 값 구하기
-            for x2 in range(x, n): # 일꾼 2는 일꾼1과 같은 행부터 가능
-                start = 0
-                if x == x2:
-                    start = y+m
-                else:
-                    start = 0
-                for y2 in range(start,n-m+1):
+            DFS(0, i, j, 0, 0)
+            resA = res # 미리 기억시키고
+            # 2. 첫번째 사람 선택한 위치부터 두번째 사람 선택 가능
+            for i2 in range(i, n):
+                y = 0
+                if i2 == i: # 같은 행에서 가능한 경우 따져야함.
+                    y = j + m  # 첫번째 일꾼 바로 다음부터 가능
+                for j2 in range(y, n - m + 1):
                     res = 0
-                    DFS(0,0,0,x2,y2)
-                    sumB = res
-                    result = max(result, sumA + sumB)
-    print(f"#{t} {result}")
+                    DFS(0,i2,j2,0,0)
+                    resB = res
+                    최종수익 = max(최종수익, resA + resB)
+    # 각 경우마다 따졌어야 하므로 resA = max(resA,res) resB = max(resB,res)가 아니라
+    # 각 경우로서 진행했어야 했다.
+    # resA = res, resB = res, 로 받아온 후 그 합이 최대인 경우만 갱신했어야했음.
+    print(f"#{t} {최종수익}")
