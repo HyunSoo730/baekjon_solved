@@ -29,12 +29,14 @@ def can_open(x,y,nx,ny): # 두 좌표 사이에 국경선 오픈 가능한지
     return False
 
 def BFS(startX,startY):
-    global visited, cnt
-    global sum_data, check
+    global visited
     dq = deque()
+    check = deque()
     check.append((startX,startY))
     dq.append((startX,startY))
-    visited[startX][startY] = True # 시작점 방문처리
+    visited[startX][startY] = True
+    sum_data = g[startX][startY] # 시작점 기준
+
     while dq:
         x,y = dq.popleft()
         for i in range(4):
@@ -42,27 +44,28 @@ def BFS(startX,startY):
             ny = y + dy[i]
             if not isInner(nx,ny): continue # 외부 좌표라면 탈출
             if not visited[nx][ny] and can_open(x,y,nx,ny):
-                cnt += 1 # 국경선 공유하는 나라 증가
                 visited[nx][ny] = True
-                sum_data += g[nx][ny]
                 check.append((nx,ny))
                 dq.append((nx,ny))
+                sum_data += g[nx][ny]
+    if len(check) > 1: # 연합결성 가능 -> 시작점 제외 포함되어 있어야함.
+        temp = int(sum_data / len(check))
+        for x,y in check:
+            g[x][y] = temp
+        return True
+    return False
 
 res = 0
 while True:
     cnt = 0 # 인구 이동 횟수
     visited = [[False] * n for _ in range(n)]
+    flag = False
     for i in range(n):
         for j in range(n):
             if not visited[i][j]:
-                sum_data = g[i][j] # 시작점
-                check = deque()
-                BFS(i,j)
-                if check:
-                    temp = int(sum_data/len(check))
-                    for x,y in check: # 연합인 애들 처리
-                        g[x][y] = temp
-    if cnt == 0:
+                if BFS(i,j):
+                    flag = True # 인구 이동 가능
+    if not flag:
         break
     res += 1
 print(res)
