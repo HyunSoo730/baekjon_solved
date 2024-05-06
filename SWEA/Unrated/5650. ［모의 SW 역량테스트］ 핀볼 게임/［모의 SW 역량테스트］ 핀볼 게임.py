@@ -39,61 +39,62 @@ def 핀볼게임(startX,startY,dir):
             d = 블록만남(d, g[x][y])
             cnt += 1
         elif 6<=g[x][y]<=10: # 웜홀 만난 경우 -> 방향은 유지.
-            holes = 웜홀[g[x][y]]
-            if not (holes[0][0] == x and holes[0][1] == y): # 반대 구멍이라면
-                x = holes[0][0]
-                y = holes[0][1]
+            holeA = 웜홀[g[x][y]][0]
+            holeB = 웜홀[g[x][y]][1]
+            if (x,y) == (holeA[0],holeA[1]): # 반대방향으로 나가야함
+                x = holeB[0]
+                y = holeB[1]
             else:
-                x = holes[1][0]
-                y = holes[1][1]
+                x = holeA[0]
+                y = holeA[1]
 
 
 
-# def 블록만남(dir,block_num): # 현재 진행방향에 따라서 블록 처리
-#     if block_num == 1:
-#         if dir == 0: dir = 2
-#         elif dir == 1: dir = 3
-#         elif dir == 2: dir = 1
-#         elif dir == 3: dir = 0
-#     elif block_num == 2:
-#         if dir == 0: dir = 1
-#         elif dir == 1: dir = 3
-#         elif dir == 2: dir = 0
-#         elif dir == 3: dir = 2
-#     elif block_num == 3:
-#         if dir == 0: dir = 3
-#         elif dir == 1: dir = 2
-#         elif dir == 2: dir = 0
-#         elif dir == 3: dir = 1
-#     elif block_num == 4:
-#         if dir == 0: dir = 2
-#         elif dir == 1: dir = 0
-#         elif dir == 2: dir = 3
-#         elif dir == 3: dir = 1
-#     elif block_num == 5:
-#         dir = (dir + 2) % 4
-#     return dir
+def 블록만남(dir,block_num): # 현재 진행방향에 따라서 블록 처리
+    if block_num == 1:
+        if dir == 0: dir = 2
+        elif dir == 1: dir = 3
+        elif dir == 2: dir = 1
+        elif dir == 3: dir = 0
+    elif block_num == 2:
+        if dir == 0: dir = 1
+        elif dir == 1: dir = 3
+        elif dir == 2: dir = 0
+        elif dir == 3: dir = 2
+    elif block_num == 3:
+        if dir == 0: dir = 3
+        elif dir == 1: dir = 2
+        elif dir == 2: dir = 0
+        elif dir == 3: dir = 1
+    elif block_num == 4:
+        if dir == 0: dir = 2
+        elif dir == 1: dir = 0
+        elif dir == 2: dir = 3
+        elif dir == 3: dir = 1
+    elif block_num == 5:
+        dir = (dir + 2) % 4
+    return dir
 
-def 블록만남(direction, num): # 현재 블록번호와, 현재 방향
-    if num == 1:
-        if direction == 2: direction = 1
-        elif direction == 3: direction = 0
-        else: direction = (direction + 2) % 4
-    elif num == 2:
-        if direction == 0: direction = 1
-        elif direction == 3: direction = 2
-        else: direction = (direction + 2) % 4
-    elif num == 3:
-        if direction == 0: direction = 3
-        elif direction == 1: direction = 2
-        else: direction = (direction + 2) % 4
-    elif num == 4:
-        if direction == 1: direction = 0
-        elif direction == 2: direction = 3
-        else: direction = (direction + 2) % 4
-    else:
-        direction = (direction + 2) % 4
-    return direction
+# def 블록만남(direction, num): # 현재 블록번호와, 현재 방향
+#     if num == 1:
+#         if direction == 2: direction = 1
+#         elif direction == 3: direction = 0
+#         else: direction = (direction + 2) % 4
+#     elif num == 2:
+#         if direction == 0: direction = 1
+#         elif direction == 3: direction = 2
+#         else: direction = (direction + 2) % 4
+#     elif num == 3:
+#         if direction == 0: direction = 3
+#         elif direction == 1: direction = 2
+#         else: direction = (direction + 2) % 4
+#     elif num == 4:
+#         if direction == 1: direction = 0
+#         elif direction == 2: direction = 3
+#         else: direction = (direction + 2) % 4
+#     else:
+#         direction = (direction + 2) % 4
+#     return direction
 
 T = int(input())
 for t in range(1,T+1):
