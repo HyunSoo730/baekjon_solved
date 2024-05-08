@@ -6,18 +6,23 @@
 # 대장균 개체ID, 분류된 이름 출력
 # ID에 대해 오름차순 정렬.
 
-SELECT ID, COLONY_NAME
-FROM (
-  SELECT ID,
-         CASE 
-           WHEN RN <= (SELECT COUNT(*) FROM ECOLI_DATA) * 0.25 THEN 'CRITICAL'
-           WHEN RN <= (SELECT COUNT(*) FROM ECOLI_DATA) * 0.50 THEN 'HIGH'
-           WHEN RN <= (SELECT COUNT(*) FROM ECOLI_DATA) * 0.75 THEN 'MEDIUM'
-           ELSE 'LOW'
-         END AS COLONY_NAME
-  FROM (
-    SELECT ID, SIZE_OF_COLONY, ROW_NUMBER() OVER (ORDER BY SIZE_OF_COLONY DESC) AS RN
+# WITH로 필요한 데이터 뽑아내자
+# 1. 대장균 개체의 크기를 내림차순으로 정렬한 것을 행번호와 함께 따로 저장하는 테이블 하나 만들기
+# 해당 데이터에서는 전체 데이터 개수도 알아야 퍼센트를 알 수 있음
+WITH TEMP AS (
+    SELECT ID, SIZE_OF_COLONY, ROW_NUMBER() OVER (ORDER BY SIZE_OF_COLONY DESC) RN 
     FROM ECOLI_DATA
-  ) t
-) u
-ORDER BY ID;
+    ORDER BY SIZE_OF_COLONY DESC
+)
+# SELECT * FROM TEMP
+
+SELECT ID, (
+    CASE 
+    WHEN RN <= (SELECT COUNT(*) FROM ECOLI_DATA) * 0.25 THEN "CRITICAL"
+    WHEN RN <= (SELECT COUNT(*) FROM ECOLI_DATA) * 0.50 THEN "HIGH"
+    WHEN RN <= (SELECT COUNT(*) FROM ECOLI_DATA) * 0.75 THEN "MEDIUM"
+    ELSE "LOW"
+    END
+) AS COLONY_NAME
+FROM TEMP
+ORDER BY ID
