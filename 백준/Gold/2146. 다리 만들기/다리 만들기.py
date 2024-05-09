@@ -1,5 +1,6 @@
 import sys
 from collections import deque
+
 # 여러 섬으로 이루어진 나라.
 # 섬을 잇는 다리 만들겠다.
 # 다리 하나만 만들고 가장 짧게.
@@ -47,7 +48,6 @@ def 최단거리(startX,startY,num):
     global res
     dq = deque()
     dq.append((startX,startY,0)) # 현재 시작위치, 경로
-    dis = [[INF] * n for _ in range(n)]
     dis[startX][startY] = 0
     while dq:
         x,y,cnt = dq.popleft()
@@ -63,12 +63,13 @@ def 최단거리(startX,startY,num):
                     dis[nx][ny] = cnt + 1
                     dq.append((nx,ny,cnt + 1))
             elif g[nx][ny] > 0: # 다른 섬
-                if cnt < dis[nx][ny]:
-                    dis[nx][ny] = cnt
-                    res = min(res,cnt)
+                if cnt + 1 < dis[nx][ny]:
+                    dis[nx][ny] = cnt + 1
+                    res = min(res,cnt + 1)
 res = INF
+dis = [[INF] * n for _ in range(n)]
 for i in range(n):
     for j in range(n):
         if g[i][j] > 0:
             최단거리(i,j,g[i][j])
-print(res)
+print(res-1)
