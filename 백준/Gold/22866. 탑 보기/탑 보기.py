@@ -1,47 +1,53 @@
 import sys
-# n개의 건물
-# 현재 있는 건물 기준 현재 있는 건물의 높이 L보다 큰 곳의 건물만 볼 수 있다.
-# N^2으로 풀 수 없음
-# 만약 볼 수 있는 건물의 개수 1개 이상 -> 거리가 가장 가까운 거리에 있는 번호
+
+# 탑 보기
+# 건물 n개, 각 건물 양 옆에 보이는 건물 수 구하는 문제
+# 본인 높이보다 큰 건물만 볼 수 있다.
+# n <= 100,000 -> N^2 안됨
+# 각 건물에서 볼 수 있는 건물 개수 구하기,
+# 만약 볼 수 있는 건물 여러개 -> 거리가 가장 가까운 건물의 번호 중 작은 번호
+
+
 n = int(input())
-data = list(map(int, input().split())) # 각 건물 높이
+heights = list(map(int, input().split())) # 건물들의 높이
+# -> 보자마자 스택 떠올림
 cnt = [0] * n
+stack = []
 INF = int(1e9)
-dis = [(INF, INF)] * n
-
-# 먼저 왼쪽에서부터 시작
-# 왼쪽에서 오른쪽으로 순회할 때 : 거리 = 현재 위치 - 스택의 top 인덱스 : i - stack[-1]
-stack = []
+nearest = [INF] * n # 가장 가까운 건물의 번호 저장
+# 먼저 왼쪽에서 오른쪽으로 진행.
 for i in range(n):
-    now = data[i] # 현재 값
-    while stack and data[stack[-1]] <= now:
+    now_height = heights[i] # 현재 건물 높이
+    while stack and heights[stack[-1]] <= now_height: # 스택에서 건물의 인덱스 저장.
         stack.pop()
-    cnt[i] += len(stack)
-    if stack:
-        dis[i] = (i - stack[-1], stack[-1]) # (거리, 인덱스 번호)
+    cnt[i] += len(stack) # 본인보다 왼쪽에 있는 건물 중 높이 더 높은 건물 개수 저장
+    if stack: # 본인보다 높은 건물이 있을 때만 갱신
+        nearest[i] = stack[-1] # 현재 건물의 가장 가까운 인덱스 저장 (오른쪽에서 돌 때 비교 진행)
     stack.append(i)
 
-# 오른쪽에서부터 시작
-# 오른쪽에서 왼쪽으로 순회할 때 : 거리 = 스택의 top 인덱스 - 현재 위치 = stack[-1] - i
+# 오른쪽에서 왼쪽으로 진행
 stack = []
-now_cnt = 0
 for i in range(n-1, -1, -1):
-    now = data[i]
-    while stack and data[stack[-1]] <= now:
+    now_height = heights[i] # 현재 건물 높이
+    while stack and heights[stack[-1]] <= now_height:
         stack.pop()
     cnt[i] += len(stack)
-    # 거리가 더 가깝거나, 거리가 같을 때 번호가 더 작은.
+    # 이제 여기서 가장 가까운 건물의 인덱스 넘버 비교해야해.
+    # 1. 거리가 가까운, 거리가 같다면 건물 번호가 더 작은
+    # 현재 건물과 기존 저장된 가장 가까운 건물 거리와 현재 건물과 여기서의 가장 가까운 건물 거리 비교
     if stack:
+        prev_dis = i - nearest[i]
         now_dis = stack[-1] - i
-        if now_dis < dis[i][0] or (now_dis == dis[i][0] and stack[-1] < dis[i][1]):
-            dis[i] = (stack[-1] - i, stack[-1]) # 거리, 인덱스
+        if nearest[i] == INF: # 현재 가장 가까운 게 없다면
+            nearest[i] = stack[-1]
+        elif i - nearest[i] > stack[-1] - i: # 지금의 거리가 더 작은 경우에 교체
+            nearest[i] = stack[-1]
+        elif i - nearest[i] == stack[-1] - i: # 거리가 같은 경우
+            nearest[i] = min(nearest[i], stack[-1]) # 더 작은 번호로 저장
     stack.append(i)
-
-# for i in range(n):
-#     print(f"현재 탑 인덱스 : {i+1}, 개수 : {cnt[i]} , 현재 탑의 가장 가까운 번호 : {dis[i][1] + 1}")
 
 for i in range(n):
     if cnt[i] == 0:
         print(0)
     else:
-        print(f"{cnt[i]} {dis[i][1] + 1}")
+        print(f"{cnt[i]} {nearest[i] + 1}")
