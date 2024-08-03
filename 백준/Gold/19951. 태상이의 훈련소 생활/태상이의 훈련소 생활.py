@@ -1,31 +1,28 @@
 import sys
 
+# 일렬로 이어진 N개의 칸. 각 칸마다 높이 존재
+# 조교 M명, 각 조교 a~b칸까지 높이 k만큼 흙을 덮거나 파라고 지시.
+# 최종 높이 미리 구해 한번에 일 수행
 
-# 태상이의 훈련소 생활
-# 일렬로 이어진 N개의 칸으로 이루어진 연병장
-# 연병장 각 칸은 1~N번까지 명칭이 붙어있음
-# 조교는 총 M명, 각 조교는 a번 칸부터 b번칸까지 높이 K만큼 흙을 덮거나 파내라고 지시
+# N,M <= 100,000 -> N^2 안됨
 
-# 연병장 각 칸의 최종 높이를 미리 구해 한 번에 일을 수행하고자 한다.
-# 지시를 모두 수행한 뒤 연병장 각 칸의 높이 구하기
-# n,m <- 100,000 -> N^2안됨.
+n,m = map(int, input().split())
+heights = list(map(int, input().split())) # 각 칸의 높이
 
-n, m = map(int, input().split())  # 연병장 크기, 조교 수
-높이 = [0] + list(map(int, input().split())) # 연병장 각 칸의 높이 -> 1번 인덱스부터 사용하기 위해
-지시 = []
+status = [0] * (n+1)
 for _ in range(m):
-    a, b, k = map(int, input().split())
-    지시.append((a,b,k))
-# k >= 0인 경우 a번부터 b번 칸까지 높이가 각각 abs(k)만큼 늘어나도록 흙을 덮어야 한다.
-# K < 0인 경우 a번 칸부터 b번 칸까지 높이가 각각 abs(k)만큼 줄어들도록 흙을 파내야 한다.
-# print(*높이[1:])
-change = [0] * (n+2) # 변화량 업데이트
-# 연병장 크기는 n, 변화량의 n+1인덱스는 단지 마지막 명령의 종료 지점을 표시하기 위해 필요할 뿐.
-for a,b,k in 지시: # 1번 인덱스부터 사용하기 위해.
-    change[a] += k # 변화 시작
-    change[b+1] -= k # 변화 종료
-# 변화량 누적 및 최종 높이 계산
-for i in range(1,n+1):
-    change[i] += change[i-1]
-    높이[i] += change[i]
-print(*높이[1:])
+    a,b,k = map(int, input().split())
+    a -= 1
+    b -= 1
+    status[a] += k
+    status[b+1] -= k
+
+# print(status)
+res = [0] * (n+1)
+for i in range(1,n):
+    status[i] += status[i-1]
+
+# print(status)
+for i in range(n):
+    heights[i] += status[i]
+print(*heights)
