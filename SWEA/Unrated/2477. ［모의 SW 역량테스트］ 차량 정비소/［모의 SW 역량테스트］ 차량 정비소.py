@@ -1,101 +1,102 @@
 import heapq
 
-# 차량 정비소. 지갑 돌려주기
-# 접수 창구번호, 정비 창구번호
-# n개의 접수 창구, m개의 정비 창구
-# 두 단계를 거쳐 차량 정비.
-# 방문 -> 접수 창구 -> 정비 창구
-# 각 접수 창구, 정비 창구의 처리 시간은 다르다.
-# 차량 정비소 방문 고객 K명, 도착하는 순서대로.
-# 차량 정비소 도착하면
-# 1-1. 빈 접수 창구가 있는 경우 빈 접수 창구 이용
-# 1-2. 빈 접수 창구가 없는 경우 빈 접수 창구가 생길 떄까지 대기
-# 접수 창구 끝나고 정비 창구로 가면
-# 2-1. 빈 정비 창구가 있는 경우 빈 정비 창구 이용
-# 2-2. 빈 정비 창구가 없다면 빈 정비 창구가 생길 때까지 대기
+# 차량 정비소
+# 접수 창구번호, 정비 창구번호 존재
+# N개의 접수 창구, M개의 정비 창구
+# 먼저 접수 창구에서 처리 후 정비창구 이동
+# 차량 정비소에 방문한 고객 K명
+# 도착 순서대로 1번부터 부여받음
+
+# 차량 정비소 도착
+# 1-1. 빈 접수 창구가 있는 경우 빈 접수 창구에서 접수
+# 1-2. 빈 접수 창구가 없는 경우 생길 때까지 대기
+
+# 정비 창구 도착
+# 2-1. 빈 정비창구가 있는 경우 빈 정비 창구에 가서 차량 정비
+# 2-2. 빈 정비 창구가 없는 경우 정비창구가 생길 떄까지 대기
 
 # 접수 창구 우선순위
-# 1. 여러 고객이 기다리는 경우 고객 번호가 낮은 순서대로 접수 창구 이용
-# 2. 빈 접수 창구가 여러개라면, 접수 창구번호가 작은 곳으로 이동
-# 여러 고객이 있는 경우, 빈 접수 창구가 여러개인 경우. 이럴 때를 생각하면서 문제를 생각해야함
+# 1. 여러 고객 대기 시 고객번호가 낮은 순서대로 우선 접수
+# 2. 빈 창구가 여러 곳인 경우 접수 창구번호가 작은 곳으로 이동
 
 # 정비 창구 우선순위
-# 1. 접수 창구 끝나고 먼저 도착한 고객 우선
-# 2. 여러 명의 고객이 동시에 오면. 이용했던 접수 창구번호 작은 고객 우선
-# 3. 빈 정비 창구가 여러개라면 정비 창구번호 작은 곳으로
-# 여러 고객이 있는 경우, 빈 정비창구가 여러개인 경우. 이럴 때를 생각하면서 문제 풀기
+# 1. 먼저 기다리는 고객 우선
+# 2. 두명 이상 고객이 동시에 도착하면 이용했던 접수 창구 번호가 작은 고객 우선
+# 3. 빈 창구 여러곳이면 정비 창구 작은곳으로 이동
 
-# 초기 주어지는 것 : 고객들의 차량 정비소 도착시간, 각 접수 창구 처리시간, 각 정비 창구 처리시간,
-# 지갑을 분실한 고객과 같은 접수 창구와 같은 정비 창구를 이용한 고객 찾고 번호 합 구하기
-# 그런 고객 없으면 -1 출력
+# 초기 :
+# 고객들의 도착시간, 접수 창구 처리 시간, 정비 창구 처리 시간 주어짐
+
+# 구하고자 : 지갑을 두고 간 고객과 같은 접수 창ㅇ구 A와 같은 정비창구 B를 이용한 고객들의 고객 번호 합
 
 T = int(input())
-for t in range(1, T + 1):
-    n, m, k, A, B = map(int, input().split())  # 접수창구 개수, 정비창구 개수, 고객 수, 잃어버린 고객이 사용한 접수창구, 정빛아구
+for t in range(1,T+1):
+    n,m,k,A,B = map(int, input().split()) # 접수창구 수, 정비창구 수, 고객 수
     A -= 1
     B -= 1
-    접수창구 = list(map(int, input().split())) # 접수창구 처리시간
-    정비창구 = list(map(int, input().split())) # 정비창구 처리시간
-    방문시간 = list(map(int, input().split())) # 각 고객 방문시간
+    접수창구 = list(map(int, input().split())) # 각 접수창구 처리시간
+    정비창구 = list(map(int, input().split())) # 각 정비창구 처리시간
+    도착시간 = list(map(int, input().split())) # 각 고객의 도착시간
 
-    waiting_접수 = [] # 각 접수창구의 (끝나는 시간, 접수창구idx)를 우선순위큐로 저장
-    waiting_정비 = [] # 각 정비창구의 (끝나는 시간, 정비창구idx)를 우선순위큐로 저장
-    # step1. 각 접수창구를 (끝나는 시간, 접수창구idx)로 우선순위큐에 저장
+    heapA = []
     for i in range(n):
-        heapq.heappush(waiting_접수, (0, i))
-
-    users = [] # 접수창구 끝나는 고객들의 (끝나는 시간, 이용했던 접수창구idx, user_idx) 우선순위큐에 넣어둠
-    for i in range(k): # 각 고객은 순서대로 들어오므로
-        visit_time = 방문시간[i] # 현재 고객이 방문한 시간
-        temp = [] # 현재 고객이 가능한 접수창구를 저장하기 위해
-        while waiting_접수 and waiting_접수[0][0] <= visit_time: # 방문시간이 가장 빨리 끝나는 접수창구의 끝나는 시간보다 같거나 크면. 후보군
-            end_time, idx_접수 = heapq.heappop(waiting_접수)
-            heapq.heappush(temp, (idx_접수, end_time))
-        if temp: # 이용 가능 접수 창구 여러개 -> 가장 접수창구번호 작은 거 이용
-            idx_접수, end_time = heapq.heappop(temp)
-            heapq.heappush(users, (visit_time + 접수창구[idx_접수], idx_접수, i)) # 접수창구 끝나는시간, 이용한 접수창구idx, 현재 고객의 인덱스
-            heapq.heappush(waiting_접수, (visit_time + 접수창구[idx_접수], idx_접수))
-        else: # 이용 가능 접수창구 없음 -> 대기. (가장 빨리 끝나는 접수창구 이용)
-            end_time, idx_접수 = heapq.heappop(waiting_접수)
-            heapq.heappush(users, (end_time + 접수창구[idx_접수], idx_접수, i))
-            heapq.heappush(waiting_접수, (end_time + 접수창구[idx_접수], idx_접수))
-
-        while temp: # 이용안한 거 다시 접수창구 대기에 넣어주기
-            idx_접수, end_time = heapq.heappop(temp)
-            heapq.heappush(waiting_접수, (end_time, idx_접수))
-
-    # step2. 접수창구 끝난 유저들을 정비창구 이용시키기
-    res =[]
+        heapq.heappush(heapA, (0,i)) # 각 접수창구의 (끝나는 시간, 접수창구번호) 로 초기화
+    heapB = []
     for i in range(m):
-        heapq.heappush(waiting_정비, (0, i)) # 각 정비창구 끝나는 시간, 정비창구 인덱스
-    while users:  # 먼저 도착한 고객들 한명씩 꺼내기 (우선순위큐에서 자연스럽게 접수창구번호 작은애들이 나옴)
-        # 이제 그러면 빈 정비창구가 여러개일 때를 고려해야함
-        end_time_접수, idx_접수, user_idx = heapq.heappop(users)
-        temp = []
-        while waiting_정비 and waiting_정비[0][0] <= end_time_접수: # 가장 먼저 끝나는 고객보다 정비창구 끝나는 시간이 같거나 작으면 모두 후보군
-            end_time_정비, idx_정비 = heapq.heappop(waiting_정비)
-            heapq.heappush(temp, (idx_정비, end_time_정비))
-        if temp: # 빈 정비창구 있다면 가장 우선순위 높은 거 꺼내서 이용
-            idx_정비, end_time_정비 = heapq.heappop(temp)
-            res.append((user_idx, idx_접수, idx_정비))
-            heapq.heappush(waiting_정비, (end_time_접수 + 정비창구[idx_정비], idx_정비))
-        else: # 빈 정비창구 없으면 가장 빨리 끝나는 .
-            end_time_정비, idx_정비, = heapq.heappop(waiting_정비)
-            res.append((user_idx, idx_접수, idx_정비))
-            heapq.heappush(waiting_정비, (end_time_정비 + 정비창구[idx_정비], idx_정비))
+        heapq.heappush(heapB, (0,i)) # 각 정비창구의 (끝나는 시간, 정비창구번호)로 초기화
 
-        while temp: # 사용 안한 거 다시.
-            idx_정비, end_time_정비 = heapq.heappop(temp)
-            heapq.heappush(waiting_정비, (end_time_정비, idx_정비))
+    # 각 고객 순서대로 진행
+    temp = []
+    users = [] # 접수창구를 이용한 고객들
+    for i in range(k):
+        time = 도착시간[i] # 현재 고객의 도착시간
+        while heapA and heapA[0][0] <= time: # 끝나는시간이 도착시간보다 작으면 바로 진행 가능
+            end_time, idx = heapq.heappop(heapA) # 해당 접수 (끝나는 시간,접수번호)
+            heapq.heappush(temp, idx) # 어차피 접수 번호만 알면 돼
+
+        if temp: # 이용 가능한 접수창구 존재 -> 번호 낮은 애들 순으로 저장 중.
+            idx = heapq.heappop(temp)
+            end_time = time + 접수창구[idx] # 현재 고객이 접수창구가 끝나는 시간
+            heapq.heappush(users, (end_time, idx, i)) # (접수 창구 끝나는 시간, 접수창구번호, 현재 이용한 고객 인덱스)
+            heapq.heappush(heapA, (end_time, idx))
+        else: # 이용 가능한 접수창구 없으면..
+            end_time, idx = heapq.heappop(heapA) # 가장 빨리 끝나는 접수창구
+            end_time += 접수창구[idx] # 가장 먼저 끝나는 접수창구 시간 + 접수창구 시간
+            heapq.heappush(users, (end_time, idx, i))
+            heapq.heappush(heapA, (end_time, idx))
+    # 정비창구 시작
+    temp = []
+    res = []
+    while users: # 먼저 도착한 순서대로 꺼내서 진행 -> 도착 시간 같은 경우 접수창구 번호 우선
+        end_timeA, idxA, userIdx = heapq.heappop(users)
+
+        while heapB and heapB[0][0] <= end_timeA: # 정비창구 끝나는 시간이 더 빠르면 바로 가능
+            _, idxB = heapq.heappop(heapB) # 정비창구 끝나는 시간, 정비창구 번호
+            heapq.heappush(temp, idxB)
+
+        if temp: # 이용 가능한 정비창구 존재
+            idxB = heapq.heappop(temp)
+            end_timeB = end_timeA + 정비창구[idxB]  # 정비창구 끝나는 시간
+            heapq.heappush(heapB, (end_timeB, idxB))
+            res.append((userIdx, idxA,idxB))
+        else: # 이용 가능한 정비 창구가 없다면
+            end_timeB, idxB = heapq.heappop(heapB) # 가장 먼저 끝나는 정비창구, 인덱스
+            end_timeB += 정비창구[idxB]
+            heapq.heappush(heapB, (end_timeB, idxB))
+            res.append((userIdx, idxA,idxB))
+
 
     sum_idx = 0
-    for user_idx, idx_접수, idx_정비 in res:
-        if idx_접수 == A and idx_정비 == B:
-            sum_idx += (user_idx +1)
+    for userIdx, idxA,idxB in res:
+        if idxA == A and idxB == B:
+            sum_idx += (userIdx+1)
+
     if sum_idx == 0:
         print(f"#{t} {-1}")
     else:
         print(f"#{t} {sum_idx}")
-        
+
+
+
 
 
