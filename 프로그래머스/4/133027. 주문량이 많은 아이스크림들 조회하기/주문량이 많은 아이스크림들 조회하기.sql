@@ -1,23 +1,18 @@
-# 아이스크림 가게 상반기 주문 정보 FIRST_HALF 테이블
-# 7월의 아이스크림 주문 정보 JULY 테이블
+# 아이스크림 가게의 상반기 주문 정보 FIRST_HALF 테이블
+# 7월의 아이스크림 주문 정보 JULY 테이블 
 
-# 7월 아이스크림 총 주문량과 상반기 아이스크림 총 주문량을 더한 값이 큰 순서대로
-# 상위 3개의 맛을 조회하는 sql문 작성
+# 두 테이블에서 7월 아이스크림 총 주문량과 상반기 아이스크림 총 주문량을 더한 값이 큰 순서대로 상위 3개의 맛 조회
 
-WITH FIRST_HALF_SUM AS (
-    SELECT FLAVOR, SUM(TOTAL_ORDER) AS SUM_A
-    FROM FIRST_HALF
-    GROUP BY FLAVOR
-),
-JULY_SUM AS (
-    SELECT FLAVOR, SUM(TOTAL_ORDER) AS SUM_B
-    FROM JULY
-    GROUP BY FLAVOR
+WITH TEMP AS (
+    SELECT *
+    FROM FIRST_HALF A
+    UNION
+    SELECT * 
+    FROM JULY B
 )
 
-SELECT A.FLAVOR
-FROM FIRST_HALF_SUM A
-JOIN JULY_SUM B
-ON A.FLAVOR = B.FLAVOR
-ORDER BY SUM_A + SUM_B DESC
-LIMIT 0,3
+SELECT FLAVOR
+FROM TEMP
+GROUP BY FLAVOR
+ORDER BY SUM(TOTAL_ORDER) DESC
+LIMIT 3
