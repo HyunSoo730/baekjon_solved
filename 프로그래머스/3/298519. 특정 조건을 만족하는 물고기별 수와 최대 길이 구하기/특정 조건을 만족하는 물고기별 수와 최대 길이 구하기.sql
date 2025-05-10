@@ -1,0 +1,20 @@
+# FISH_INFO : 잡은 물고기들의 정보
+# 물고기 길이 10cm 이하일 경우 LENGTH는 NULL
+
+# FIST_INFO 테이블에서 평균 길이가 33cm 이상인 물고기들을 종류별로 분류하여
+# 잡은 수, 최대 길이, 물고기의 종류를 출력하는 SQL문 작성
+# 물고기 종류에 대해 오름차순 정렬, 10cm 이하의 물고기들은 10cm로 취급하여 평균 길이 구하기
+
+WITH TEMP AS (
+    SELECT ID, FISH_TYPE, IFNULL(LENGTH, 10) AS LENGTH, TIME
+    FROM FISH_INFO
+)
+SELECT COUNT(*) AS FISH_COUNT, MAX(LENGTH) AS MAX_LENGTH, FISH_TYPE
+FROM (
+    SELECT ID, FISH_TYPE, LENGTH
+    ,AVG(LENGTH) OVER(PARTITION BY FISH_TYPE) AS AVG_LENGTH
+    FROM TEMP 
+) AS TEMP2
+WHERE AVG_LENGTH >= 33
+GROUP BY FISH_TYPE
+ORDER BY FISH_TYPE ASC
