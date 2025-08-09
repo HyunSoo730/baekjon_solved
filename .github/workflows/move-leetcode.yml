@@ -6,6 +6,12 @@ on:
     branches:
       - main
       - master
+    paths-ignore:  # 이 경로들은 무시 (무한 루프 방지)
+      - 'LeetCode/**'
+      - '.github/**'
+      - '백준/**'
+      - 'SWEA/**'
+      - '프로그래머스/**'
 
 jobs:
   move-files:
@@ -19,24 +25,39 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Pull latest changes
+        run: |
+          git pull origin main --rebase
+
       - name: Move LeetCode solutions
         run: |
           mkdir -p LeetCode
           
-          echo "=== Current files ==="
-          ls -la
-          
+          echo "=== Looking for LeetCode problems ==="
           moved=false
-          for d in [0-9]*; do
-            if [ -d "$d" ]; then
-              echo "Found LeetCode problem: $d"
-              mv "$d" "LeetCode/"
+          
+          # 루트에 있는 숫자로 시작하는 모든 디렉토리 찾기
+          for dir in [0-9]*; do
+            if [ -d "$dir" ] && [ "$dir" != "LeetCode" ]; then
+              echo "Moving: $dir to LeetCode/"
+              mv "$dir" "LeetCode/"
               moved=true
             fi
           done
           
-          if [ "$moved" = false ]; then
-            echo "No LeetCode problems found to move"
+          # 하이픈이 포함된 디렉토리도 체크 (예: two-sum)
+          for dir in *-*; do
+            if [ -d "$dir" ] && [[ "$dir" =~ ^[a-z] ]] && [ "$dir" != "LeetCode" ]; then
+              echo "Moving: $dir to LeetCode/"
+              mv "$dir" "LeetCode/"
+              moved=true
+            fi
+          done
+          
+          if [ "$moved" = true ]; then
+            echo "Successfully moved directories"
+          else
+            echo "No directories to move"
           fi
 
       - name: Commit and Push changes
@@ -44,12 +65,9 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # 변경사항 확인
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
-            git commit -m "📁 Move LeetCode solutions to LeetCode folder"
-            
-            # Pull 먼저 하고 Push (충돌 해결) 👈 핵심!
+            git commit -m "📁 Auto-organize: Move LeetCode solutions to LeetCode folder"
             git pull --rebase origin main
             git push
           else
