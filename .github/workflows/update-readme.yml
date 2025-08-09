@@ -1,75 +1,35 @@
-name: Move LeetCode Solutions
 
-on:
-  workflow_dispatch:
+# 이 워크플로우는 update.py 파일을 실행합니다. 즉 README.md 파일을 업데이트합니다.
+
+name: Update readme # GitHub Actions 탭에서 확인할 수 있는 액션 이름
+
+on: # jobs가 실행되어야 하는 상황 정의
   push:
-    branches:
-      - main
-      - master
-    paths-ignore:  # 이 경로들은 무시 (무한 루프 방지)
-      - 'LeetCode/**'
-      - '.github/**'
-      - '백준/**'
-      - 'SWEA/**'
-      - '프로그래머스/**'
+    branches: [ "main" ] # main 브랜치에 push가 발생했을 때
+  pull_request:
 
-jobs:
-  move-files:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+jobs: # 실제 실행될 내용
+  build:
+    runs-on: ubuntu-latest # 빌드 환경
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Pull latest changes
-        run: |
-          git pull origin main --rebase
-
-      - name: Move LeetCode solutions
-        run: |
-          mkdir -p LeetCode
-          
-          echo "=== Looking for LeetCode problems ==="
-          moved=false
-          
-          # 루트에 있는 숫자로 시작하는 모든 디렉토리 찾기
-          for dir in [0-9]*; do
-            if [ -d "$dir" ] && [ "$dir" != "LeetCode" ]; then
-              echo "Moving: $dir to LeetCode/"
-              mv "$dir" "LeetCode/"
-              moved=true
-            fi
-          done
-          
-          # 하이픈이 포함된 디렉토리도 체크 (예: two-sum)
-          for dir in *-*; do
-            if [ -d "$dir" ] && [[ "$dir" =~ ^[a-z] ]] && [ "$dir" != "LeetCode" ]; then
-              echo "Moving: $dir to LeetCode/"
-              mv "$dir" "LeetCode/"
-              moved=true
-            fi
-          done
-          
-          if [ "$moved" = true ]; then
-            echo "Successfully moved directories"
-          else
-            echo "No directories to move"
-          fi
-
-      - name: Commit and Push changes
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          
-          if [ -n "$(git status --porcelain)" ]; then
-            git add -A
-            git commit -m "📁 Auto-organize: Move LeetCode solutions to LeetCode folder"
-            git pull --rebase origin main
-            git push
-          else
-            echo "No changes to commit"
-          fi
+    - uses: actions/checkout@v3 # checkout
+    - name: Set up Python 3.10 
+      uses: actions/setup-python@v3 # setup-python
+      with:
+        python-version: "3.10" # 3.10버전 파이썬 사용
+    - name: Install dependencies # 1) 스크립트에 필요한 dependency 설치
+      run: |
+        python -m pip install --upgrade pip
+        pip install python-leetcode 
+    - name: Run update.py # 2) update.py 실행
+      run: |
+        python update.py
+    - name: Commit changes # 3) 추가된 파일 commit
+      run: |
+        git config --global user.name 'HyunSoo730' # 유저명
+        git config --global user.email 'whgustn730@gmail.com' # 유저 이메일
+        git add -A
+        git diff --exit-code || git commit -am "auto update README.md" # 커밋 메시지
+    - name: Push changes # 4) 메인에 푸시
+      run: |
+        git push
