@@ -6,7 +6,7 @@ on:
     branches:
       - main
       - master
-    paths-ignore:  # 이 경로들은 무시 (무한 루프 방지)
+    paths-ignore:
       - 'LeetCode/**'
       - '.github/**'
       - '백준/**'
@@ -39,15 +39,24 @@ jobs:
           # 루트에 있는 숫자로 시작하는 모든 디렉토리 찾기
           for dir in [0-9]*; do
             if [ -d "$dir" ] && [ "$dir" != "LeetCode" ]; then
+              # 이미 LeetCode 폴더에 있으면 삭제 후 이동
+              if [ -d "LeetCode/$dir" ]; then
+                echo "Removing existing LeetCode/$dir"
+                rm -rf "LeetCode/$dir"
+              fi
               echo "Moving: $dir to LeetCode/"
               mv "$dir" "LeetCode/"
               moved=true
             fi
           done
           
-          # 하이픈이 포함된 디렉토리도 체크 (예: two-sum)
+          # 하이픈이 포함된 디렉토리도 체크
           for dir in *-*; do
             if [ -d "$dir" ] && [[ "$dir" =~ ^[a-z] ]] && [ "$dir" != "LeetCode" ]; then
+              if [ -d "LeetCode/$dir" ]; then
+                echo "Removing existing LeetCode/$dir"
+                rm -rf "LeetCode/$dir"
+              fi
               echo "Moving: $dir to LeetCode/"
               mv "$dir" "LeetCode/"
               moved=true
