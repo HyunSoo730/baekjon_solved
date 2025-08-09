@@ -1,36 +1,57 @@
 name: Move LeetCode Solutions
 
 on:
+  workflow_dispatch:
   push:
-    paths:
-      - '[0-9][0-9][0-9][0-9]-*/**'
+    branches:
+      - main
+      - master
 
 jobs:
   move-files:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Move LeetCode solutions
         run: |
           mkdir -p LeetCode
           
-          for d in [0-9][0-9][0-9][0-9]-*; do
+          echo "=== Current files ==="
+          ls -la
+          
+          moved=false
+          for d in [0-9]*; do
             if [ -d "$d" ]; then
-              echo "Moving: $d"
+              echo "Found LeetCode problem: $d"
               mv "$d" "LeetCode/"
+              moved=true
             fi
           done
+          
+          if [ "$moved" = false ]; then
+            echo "No LeetCode problems found to move"
+          fi
 
-      - name: Commit changes
+      - name: Commit and Push changes
         run: |
-          if git status --porcelain | grep .; then
-            git config user.name 'github-actions[bot]'
-            git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # 변경사항 확인
+          if [ -n "$(git status --porcelain)" ]; then
             git add -A
             git commit -m "📁 Move LeetCode solutions to LeetCode folder"
+            
+            # Pull 먼저 하고 Push (충돌 해결) 👈 핵심!
+            git pull --rebase origin main
             git push
+          else
+            echo "No changes to commit"
           fi
