@@ -102,3 +102,11 @@
 |4963. 섬의 개수|[링크](./%EB%B0%B1%EC%A4%80/Silver/4963.%E2%80%85%EC%84%AC%EC%9D%98%E2%80%85%EA%B0%9C%EC%88%98/%EC%84%AC%EC%9D%98%E2%80%85%EA%B0%9C%EC%88%98.py)|
 |7562. 나이트의 이동|[링크](./%EB%B0%B1%EC%A4%80/Silver/7562.%E2%80%85%EB%82%98%EC%9D%B4%ED%8A%B8%EC%9D%98%E2%80%85%EC%9D%B4%EB%8F%99/%EB%82%98%EC%9D%B4%ED%8A%B8%EC%9D%98%E2%80%85%EC%9D%B4%EB%8F%99.py)|
 |9237. 이장님 초대|[링크](./%EB%B0%B1%EC%A4%80/Silver/9237.%E2%80%85%EC%9D%B4%EC%9E%A5%EB%8B%98%E2%80%85%EC%B4%88%EB%8C%80/%EC%9D%B4%EC%9E%A5%EB%8B%98%E2%80%85%EC%B4%88%EB%8C%80.py)|
+
+<!---LeetCode Topics Start-->
+# LeetCode Topics
+## Database
+|  |
+| ------- |
+| [0626-exchange-seats](https://github.com/HyunSoo730/baekjon_solved/tree/master/0626-exchange-seats) |
+<!---LeetCode Topics End-->
