@@ -1,24 +1,26 @@
 import sys
 
-input = sys.stdin.readline
-sys.setrecursionlimit(10**6)
+# 배낭 문제 -> 냅색 알고리즘
+# N개의 물건, 각 물건은 무게 W, 가치 V, 최대 K만큼의 무게만 가능
 
+n,k = map(int, input().split())
 data = []
-n, limit = map(int, input().split()) #보석 종류, 무게 한계값
 for _ in range(n):
-    a,b = map(int, input().split())
-    data.append((a,b)) #무게, 가치
-data.insert(0,(0,0)) #0번 인덱스 사용안함
-dp = [[0] * (limit+1) for _ in range(n+1)]
+    w,v = map(int, input().split())
+    data.append((w,v))
 
-for i in range(1,n+1):
-    for j in range(1,limit + 1):
-        weight = data[i][0] # 현재 물건 무게
-        value = data[i][1] # 현재 물건 가치
+dp = [[0] * (k+1) for _ in range(n+1)]
+# dp[i][w] : i번째 물건까지 고려, 무게 w이하일 때 최대 가치
 
-        if j < weight: #현재 물건 담을 수 없으니 이전꺼 가져와야함
-            dp[i][j] = dp[i-1][j]
-        else: #현재 물건 담을 수 있음
-            dp[i][j] = max(dp[i-1][j-weight] + value, dp[i-1][j])
+for i in range(1, n+1):
+    weight, value = data[i-1]
+    for w in range(k+1):
+        # 현재 i번째 물건을 안 넣는 경우
+        dp[i][w] = dp[i-1][w]
+        # i번째 물건을 넣을 수 있고, 넣는 게 유리한 경우
+        if w >= weight: # 넣을 수 있다면 더 좋은지 확인(이 조건이 있어야함 : 없으면 음수 인덱스 발생) -> 더 좋은쪽 선택 : max(현재값, 넣는경우값)
+            # dp[i-1][w-weight] + value의 의미 : dp[i-1][w-weight] : 현재 물건의 무게만큼 여유를 남겨두고, 이전 물건들로 얻을 수 있는 최대가치
+            # +value : 그 여유 공간에 현재 물건을 넣었을 때의 추가 가치
+            dp[i][w] = max(dp[i][w], dp[i-1][w-weight] + value)
 
-print(dp[n][limit])
+print(dp[n][k])
