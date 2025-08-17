@@ -114,4 +114,5 @@
 | [0608-tree-node](https://github.com/HyunSoo730/baekjon_solved/tree/master/0608-tree-node) |
 | [0626-exchange-seats](https://github.com/HyunSoo730/baekjon_solved/tree/master/0626-exchange-seats) |
 | [1135-customers-who-bought-all-products](https://github.com/HyunSoo730/baekjon_solved/tree/master/1135-customers-who-bought-all-products) |
+| [1452-restaurant-growth](https://github.com/HyunSoo730/baekjon_solved/tree/master/1452-restaurant-growth) |
 <!---LeetCode Topics End-->
