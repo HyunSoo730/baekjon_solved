@@ -75,7 +75,7 @@ public class Main {
             if (now.x == endX && now.y == endY) {
                 if (now.dis < min_dis) {
                     min_dis = now.dis;
-                    break; // ! 도착점에서 다시 할 필요 없음.
+                    continue; // ! 도착점에서 다시 할 필요 없음.
                 }
             }
 
