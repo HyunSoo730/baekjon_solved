@@ -13,8 +13,6 @@ WITH tempA as (
         ,turn
     from Queue
 )
-select person_name
+select DISTINCT LAST_VALUE(person_name) over() as person_name
 from tempA
 where total_sum <= 1000
-order by turn desc
-limit 1;
