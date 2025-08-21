@@ -6,13 +6,17 @@
 # 즉 16일자 데이터가 있다면 해당 데이터 사용
 # 16일자 데이터가 없다면 그 이전 데이터 사용.
 # - 그 이전 데이터 없다면 가격 10
-select DISTINCT p1.product_id
-    ,IFNULL(
-        (select new_price
-        from Products p2
-        where p1.product_id = p2.product_id
-        and p2.change_date <= DATE("2019-08-16")
-        order by p2.change_date desc
-        limit 1)
-    ,10) as price
-from Products p1
+with tempA as (
+    select product_id, 
+        RANK() OVER(partition by product_id order by change_date desc) as rn,
+        new_price
+    from Products
+    where change_date <= DATE("2019-08-16")
+)
+select product_id, new_price as price
+from tempA 
+where rn = 1
+union
+select product_id, 10
+from Products 
+where product_id not in (select product_id from tempA)
