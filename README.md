@@ -115,6 +115,7 @@
 | [0626-exchange-seats](https://github.com/HyunSoo730/baekjon_solved/tree/master/0626-exchange-seats) |
 | [1135-customers-who-bought-all-products](https://github.com/HyunSoo730/baekjon_solved/tree/master/1135-customers-who-bought-all-products) |
 | [1268-market-analysis-i](https://github.com/HyunSoo730/baekjon_solved/tree/master/1268-market-analysis-i) |
+| [1278-product-price-at-a-given-date](https://github.com/HyunSoo730/baekjon_solved/tree/master/1278-product-price-at-a-given-date) |
 | [1327-last-person-to-fit-in-the-bus](https://github.com/HyunSoo730/baekjon_solved/tree/master/1327-last-person-to-fit-in-the-bus) |
 | [1452-restaurant-growth](https://github.com/HyunSoo730/baekjon_solved/tree/master/1452-restaurant-growth) |
 <!---LeetCode Topics End-->
