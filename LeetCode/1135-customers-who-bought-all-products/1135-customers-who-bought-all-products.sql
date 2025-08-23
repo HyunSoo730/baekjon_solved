@@ -1,4 +1,6 @@
-SELECT customer_id
-FROM Customer
-GROUP BY customer_id
-HAVING COUNT(DISTINCT product_key) = (SELECT COUNT(*) FROM Product)
+# 모든 제품을 산 손님 찾기
+
+select customer_id
+from Customer
+group by customer_id
+having COUNT(DISTINCT product_key) = (select COUNT(*) FROM Product)
