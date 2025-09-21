@@ -1,36 +1,31 @@
 import sys
 
-N, C = map(int ,input().split())
+# 집 N개가 수직선 위에 존재.
+# 공유기 C개 설치 예정. 최대한 많은 곳에서 와이파이를 사용하고자 함.
+# 인접한 두 공유기 사이의 거리를 가능한 크게 설치.
+# C개의 공유기를 N개의 집에 설치하여 가장 인접한 두 공유기 사이의 거리를 최대로 하기.
+# 두 공유기 사이 거리 최대... 결정 문제
+# 두 공유기 사이 거리 늘어날 수록 공유기 설치 개수는 줄어든다.
+n,c = map(int, input().split())
 data = []
+for _ in range(n):
+    temp = int(input())
+    data.append(temp)
 
-for _ in range(N):
-    data.append(int(input()))
-
-data.sort()
-
-#값의 범위가 정해져있음
-start =1
-end = max(data) -1
-
-def countLen(len):
-    cnt = 1 #시작할 때 박고 시작
-    now = data[0] #현재 박힌 위치 now
-    for i in range(1, N):
-        if data[i] - now >= len:
+data.sort() # 이 문제는 정렬이 필요
+def is_possible(length):
+    cnt = 1 # 시작 지점에 공유기를 박아야 인접한 두 공유기 사이의 거리를 가능한 크게 할 수 있다 (자명한 사실)
+    now = data[0] # 이전 공유기 위치 저장.
+    for i in range(1,n):
+        if data[i] - now >= length: # 설치해야함
             cnt += 1
             now = data[i]
-    
-    return cnt
-
-res = -2424242424 #최대 거리
-while start <= end:
-    mid = (start + end) // 2 #인접한 두 공유기 사이의 최대 거리 이 거리보단 같거나 커야 설치가능
-
-    if countLen(mid) >= C: #거리가 작으면 작을 수록 더 설치하므로 어쩃든 C이상이면 답의 유효한 범위
-        res = mid
-        start = mid + 1
+    return cnt >= c
+left, right = 1, max(data) + 1 # 두 공유기 사이 거리.. 최악의 경우 !
+while left < right:
+    mid = (left + right) // 2 # 두 공유기 사이 거리.
+    if is_possible(mid): # c개 설치 가능
+        left = mid + 1
     else:
-        end = mid - 1
-
-print(res)
-
+        right = mid
+print(left -1)
