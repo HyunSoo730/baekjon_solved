@@ -21,7 +21,7 @@ def is_possible(length):
             cnt += 1
             now = data[i]
     return cnt >= c
-left, right = 1, max(data) + 1 # 두 공유기 사이 거리.. 최악의 경우 !
+left, right = 1, data[-1] - data[0] + 1 # 두 공유기 사이 거리 최대거리는 양 끝 집 사이 거리 !.. 최악의 경우 !
 while left < right:
     mid = (left + right) // 2 # 두 공유기 사이 거리.
     if is_possible(mid): # c개 설치 가능
