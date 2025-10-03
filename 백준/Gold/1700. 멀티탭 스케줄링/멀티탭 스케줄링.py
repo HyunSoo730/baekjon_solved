@@ -1,40 +1,54 @@
 import sys
-from collections import deque
+import heapq
 
-
+# 멀티탭. 플러그를 빼는 횟수를 최소화 하는 방법.
 n,k = map(int, input().split())
-data = list(map(int, input().split())) # k개의 각 전기용품 어떤 거 썼는지
+data = list(map(int, input().split()))
 
-# 핵심은 만약 이미 최대치로 꽂혀있다면 가장 나중에 사용될 제품을 뽑아야 한다. (그래야 중복 최소화)
+"""
+멀티탭 N개 (한정된 자원)
+- K개 순서대로 사용.
+- 플러그 빼는 횟수 최소화
+콘센트 꽉 찼을 때 어떤 플러그를 뽑아야 하는가.
 
-def 가장늦게사용하는제품뽑기():
-    if not dq:
-        return
-    last_idx = -1 #  가장 마지막으로 사용될 때의 인덱스
-    last_num = -1 # 가장 마지막으로 사용하는 제품의 번호
-    for num in check: # 현재 멀티탭에 꽂혀있는 애들 꺼내서
-        if num not in dq: # 남은 것들중에 존재하지 않음. -> 이놈을 뽑아야함
-            last_num = num # 갱신 후 바로 끝.
-            break
-        else: # 현재 존재한다면 인덱스 갱신
-            idx = dq.index(num)
-            if idx > last_idx:
-                last_idx = idx
-                last_num = num
-    check.remove(last_num)
+최적 전략 : 가장 나중에 다시 사용될 플러그를 뽑는다.
+이유 :
+- 곧 사용할 것 뽑으면 -> 바로 다시 꽂아야함
+- 늦게 사용할 것 뽑으면 -> 오래 비워둘 수 있음
 
+제거 우선순위
+- 더 이상 사용하지 않는 것
+- 가장 나중에 쓰는 것
+"""
 
-dq = deque(data)
-check = set()
-res = 0
-while dq: # 아직 존재한다면
-    now = dq.popleft() # 현재 콘센트
-    if now in check: # 이미 존재하면 필요없음
+cnt = 0
+check = set() # 이미 있는 것도 알아야지
+for i in range(k):
+    now = data[i] # 현재 넘버
+    # Case 1. 이미 꽂혀있음
+    if now in check: # 이미 존재하면
         continue
-    if len(check) < n: # 여유공간 존재
-        check.add(now)
-    else: # 여유공간 없다면 가장 마지막에 사용되는 것 뽑아야 함.
-        가장늦게사용하는제품뽑기()
-        res += 1 # 횟수 추가
-        check.add(now) # 지웠으니 현재꺼 추가.
-print(res)
+    # Case 2. 빈 자리 있음
+    if len(check) < n: # 아직 덜 담겼어
+        check.add(data[i]) # 계속 담을 수 있음
+        continue
+
+    # Case 3. 꽉 참 - 제거 대상 선택
+    heap = [] # 힙 구성 : 다음 사용 시점, 제품 번호 가장 나중에 쓰이는 것을 뽑아야 하니 최대힙 (인덱스기반!)
+    for num in check:
+        # num 다음 사용 시점 찾기
+        next_use = k # 기본값 : 끝 (더이상 안씀)
+        for j in range(i + 1, k):
+            if data[j] == num:
+                next_use = j
+                break
+
+        # 최대힙을 위해 음수로
+        heapq.heappush(heap, (-next_use, num))
+    # 가장 나중 것 제거
+    _, num = heapq.heappop(heap)
+    check.remove(num)
+    check.add(now)
+    cnt += 1
+
+print(cnt)
