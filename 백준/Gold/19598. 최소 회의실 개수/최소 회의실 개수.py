@@ -1,28 +1,22 @@
 import sys
 import heapq
 
-# n개의 회의. 각 회의는 시작시간, 끝나는 시간
-# 한 회의실에 하나의 회의만 진행
-# N개의 회의를 모두 진행할 수 있는 최소 회의실 개수 구하기
-# O(N^2) 안됨. -> 시간 복잡도 고려하면서.
-
+# N개의 회의 모두 진행할 수 있는 최소 회의실 개수.
+# N^2 불가.
+# 끝나는 시간대ㅐ로 꺼내서. 현재 가지고 있는 회의실에서 진행 가능한지 판단. 가능하면 + 불가능이면 회의실 + 1
 n = int(input())
 data = []
 for _ in range(n):
-    a,b = map(int, input().split())
-    data.append((a,b))
+    start,end = map(int, input().split())
+    data.append((start,end))
 
-data.sort(key = lambda x : (x[0], x[1])) # 시작시간 오름차순
-
+data.sort(key = lambda x : x[0])
 heap = []
-heapq.heappush(heap, data[0][1]) # 가장 빨리 끝나는 시간 넣어두고.
-cnt = 1
-for i in range(1,n):
-    start,end = data[i]
-    if start < heap[0]: # 진행중인 회의의 끝나는시간보다 현재 회의 시작시간이 작으면
-        cnt += 1
-    else: # 시작시간이 같거나 크면. 이어서 가능 -> 꺼내기
-        heapq.heappop(heap)
-    heapq.heappush(heap, end) # 끝나는 시간 넣어.
-
-print(cnt)
+for start, end in data:
+    # 가장 빨리 끝나는 회의실이 현재 회의 시작 전에 끝나는가 ?
+    if heap and heap[0] <= start: # heap 에는 종료시간 있어.
+        heapq.heappop(heap) # 해당 회의실 재사용 해야함.
+    # 현재 회의 종료 시간 추가 (무조건)
+    heapq.heappush(heap, end)
+res = len(heap)
+print(res)
