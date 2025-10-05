@@ -1,37 +1,27 @@
 import heapq
 
 def solution(n, works):
-    # 야근 지수.
-    # 야근을 하면 피로도가 쌓인다. 
-    # 야근 피로도는 야근을 시작한 시점에서 남은 일의 작업략을 제곱하여 더한 값.
-    # 야근 피로도 = 시작 시점 + 작업량**2
-    
+    # 야근 피로도 : 야근 시작 시점에 남은 일의 작업량 제곱하여 더한 값
     # N시간 동안 야근 피로도 최소화하도록 일하기
-    # 1시간 동안 작업량 1만큼 처리할 수 있다
-    # 퇴근까지 남은 N시간과 각 일에 대한 작업량 works에 대해 야근 피로도 최소화한 값을 리턴하는 함수
+    # 1시간에 작업량 1 처리
+    # 남은 N시간, 각 작업량 works에 대해 야근 피로도 최소화 리턴
+    # 결국 가장 작업 많이 남은 애들 줄여야함 -> 그리디적인 생각
     
-    # works <= 20,000 -> N^2 안됨
     heap = []
-    for i in range(len(works)):
-        time = works[i]
-        heapq.heappush(heap, -time)
+    for x in works:
+        heapq.heappush(heap, -x) # 최대힙으로 전환
     
-    for i in range(n):
-        if heap:
-            time = -heapq.heappop(heap)
-            time -= 1
-            if time > 0:
-                heapq.heappush(heap, -time)
-        else:
-            break
+    for _ in range(n): # n번 반복
+        if heap[0] == 0: # 더이상 X
+            return 0
+        work = -heapq.heappop(heap)
+        work -= 1 # 작업량 -1
+        heapq.heappush(heap, -work)
     
     res = 0
+    print(heap)
     while heap:
-        time = -heapq.heappop(heap)
-        res += time ** 2
+        work = -heapq.heappop(heap)
+        res += work * work
     print(res)
     return res
-        
-        
-        
-    
