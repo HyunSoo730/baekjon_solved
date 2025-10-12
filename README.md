@@ -123,5 +123,6 @@
 | [1327-last-person-to-fit-in-the-bus](https://github.com/HyunSoo730/baekjon_solved/tree/master/1327-last-person-to-fit-in-the-bus) |
 | [1452-restaurant-growth](https://github.com/HyunSoo730/baekjon_solved/tree/master/1452-restaurant-growth) |
 | [1480-movie-rating](https://github.com/HyunSoo730/baekjon_solved/tree/master/1480-movie-rating) |
+| [3828-analyze-organization-hierarchy](https://github.com/HyunSoo730/baekjon_solved/tree/master/3828-analyze-organization-hierarchy) |
 | [3921-find-consistently-improving-employees](https://github.com/HyunSoo730/baekjon_solved/tree/master/3921-find-consistently-improving-employees) |
 <!---LeetCode Topics End-->
