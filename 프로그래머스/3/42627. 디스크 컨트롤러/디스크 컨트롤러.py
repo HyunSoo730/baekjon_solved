@@ -1,41 +1,33 @@
 import heapq
 def solution(jobs):
-    # 하드디스크는 한 번에 하나의 작업만 수행.
-    # 우선순위 존재
-    # 작업 : 작업 번호, 요청 시각, 소요 시간 가지고 있음
-    # 하드디스크가 작업 안하고 있으면 가장 우선순위가 높은 작업 진행
-    # 1. 소요시간 짧고, 요청 시각 빠르고, 작업 번호 작은 것 순으로 우선순위
-    # 구하고자 : 요청 작업의 반환 시간의 평균 구하기
-    # 각 작업 : 요청시각 ~ 끝나는 시각
-    # jobs에 요청시점, 소요시간 담겨져 있음
+    # 하드디스크는 한 번에 하나의 작업만 수행 가능
+    # 각 작업은 작업 번호, 작업 요청 시각, 작업 소요 시간 존재
+    # 가장 우선순위 높은 거 꺼내서 작업..
+    # 우선순위 1. 소요시간 짧은, 2. 요청시각 빠른, 3. 작업 번호 작은.
+    
     heap = []
+    cnt = 0 # 모두 완료해야함
+    cur_time = 0 # 현재시간 
+    jobs.sort(key = lambda x : x[0]) # 우선 요청시점 기준으로 정렬 진행. 
+    idx = 0 # 불가능한 경우를 생각해서 
     res = 0
-    idx = 0
-    cnt = 0
-    cur_time = 0
     n = len(jobs)
-    jobs.sort()
-    while cnt < n: #  # 모두 완료해야함
-        # step1. 현재 요청시각 기준으로 가능한 애들 모두 추출
-        while idx < n and jobs[idx][0] <= cur_time:
+    while cnt < n:
+        while idx < n and jobs[idx][0] <= cur_time: # 현재시간 이라면 추출 가능
             heapq.heappush(heap, (jobs[idx][1], jobs[idx][0], idx))
             idx += 1
-        # step2. 현재 시간에서 가능한 작업 진행
-        if heap:
-            # 가장 짧은 작업 처리
-            timeB, timeA, _ = heapq.heappop(heap) # 소요시간, 요청시각
-            cur_time += timeB # 현재시간 수정
-            res += (cur_time - timeA)
-            cnt += 1 # 하나 해결 
-        else:
-            # 현재 가능한 경우가 없으면 현재시간 변경
-            if idx < n:
+        
+        if heap: # 가능하다면 가장 빠른걸로
+            timeB, timeA, _ = heapq.heappop(heap) # 소요시간, 요청시각, 인덱스
+            cur_time += timeB # 현재시간 변경
+            res += (cur_time - timeA) # 반환 시간은 종료시간 - 요청시각
+            cnt += 1 # 해결 개수 추가 
+        else: # 없으면 가장 빠른 인덱스의 시간대로 이동
+            if idx < n: # 물론 인덱스 내에서 
                 cur_time = jobs[idx][0]
+            
     print(res // n)
     return res // n
     
+            
         
-        
-        
-        
-    
